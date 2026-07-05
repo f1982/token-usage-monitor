@@ -4,8 +4,8 @@ A native macOS app + desktop widget that shows your local **Claude Code** usage
 at a glance — session (5-hour) and weekly quota, scoped model limits, and
 opt-in per-project token analytics. Everything runs and stays on your machine.
 
-The app is **Claude Code Usage Widget**, a SwiftUI + WidgetKit project living in
-[`ClaudeUsageWidget/`](ClaudeUsageWidget/).
+The app is **Token Usage Monitor**, a SwiftUI + WidgetKit project living in
+[`TokenUsageMonitor/`](TokenUsageMonitor/).
 
 ## What it does
 
@@ -34,14 +34,14 @@ Quota is fetched through providers, tried in order:
 
 You feed the default source with a Claude Code statusline command that writes
 the normalized state file — the app never installs hooks itself. See
-[the app README](ClaudeUsageWidget/README.md#setting-up-the-statusline-source)
+[the app README](TokenUsageMonitor/README.md#setting-up-the-statusline-source)
 for the exact `~/.claude/settings.json` snippet and script.
 
 ## Layout
 
 ```
 agent-usage-monitor/
-├── ClaudeUsageWidget/        # the macOS app + widget (XcodeGen project)
+├── TokenUsageMonitor/        # the macOS app + widget (XcodeGen project)
 │   ├── App/                  # SwiftUI app: UI, Providers, Services
 │   ├── Shared/               # domain models, settings, analytics, caches
 │   ├── Widget/               # WidgetKit extension (reads App Group caches)
@@ -58,17 +58,17 @@ The `.xcodeproj` is generated from `project.yml`.
 
 ```sh
 brew install xcodegen                     # once
-cd ClaudeUsageWidget
+cd TokenUsageMonitor
 xcodegen generate                         # after editing project.yml or adding files
 
 # build + test from the CLI
-xcodebuild -project ClaudeUsageWidget.xcodeproj -scheme ClaudeUsageWidget \
+xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
   -allowProvisioningUpdates build
-xcodebuild -project ClaudeUsageWidget.xcodeproj -scheme ClaudeUsageWidget \
+xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
   -destination 'platform=macOS' -allowProvisioningUpdates test
 ```
 
-Or just open `ClaudeUsageWidget/ClaudeUsageWidget.xcodeproj` in Xcode and run.
+Or just open `TokenUsageMonitor/TokenUsageMonitor.xcodeproj` in Xcode and run.
 
 Signing uses team `4MX24QZ69S` with automatic provisioning (required by the App
 Groups capability). If the first CLI build fails on a missing provisioning
@@ -81,7 +81,7 @@ and `Shared/Constants/AppGroup.swift`, then re-run `xcodegen generate`.
 ## Using the widget
 
 1. Launch the app once so it fetches usage and caches a snapshot in the
-   `4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget` App Group.
+   `4MX24QZ69S.group.me.andycao.app.tokenusagemonitor` App Group.
 2. Right-click the desktop → **Edit Widgets** → search "Claude Code Usage" and
    add the small or medium widget.
 3. Keep the app running (it auto-refreshes every 5 minutes) so data stays fresh.
@@ -90,6 +90,6 @@ and `Shared/Constants/AppGroup.swift`, then re-run `xcodegen generate`.
 
 ## Docs
 
-- [`ClaudeUsageWidget/README.md`](ClaudeUsageWidget/README.md) — full app docs,
+- [`TokenUsageMonitor/README.md`](TokenUsageMonitor/README.md) — full app docs,
   statusline setup, behavior notes
 - [`docs/`](docs/) — v0.1 and v0.2 implementation specs

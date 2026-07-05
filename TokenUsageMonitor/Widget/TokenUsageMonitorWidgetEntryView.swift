@@ -1,10 +1,10 @@
 import SwiftUI
 import WidgetKit
 
-struct ClaudeUsageWidgetEntryView: View {
+struct TokenUsageMonitorWidgetEntryView: View {
     @Environment(\.widgetFamily) private var family
 
-    var entry: ClaudeUsageWidgetEntry
+    var entry: TokenUsageMonitorWidgetEntry
 
     var body: some View {
         Group {

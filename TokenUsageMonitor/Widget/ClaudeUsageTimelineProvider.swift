@@ -11,11 +11,11 @@ struct ClaudeUsageTimelineProvider: TimelineProvider {
     let cacheStore = UsageCacheStore()
     let projectCacheStore = ProjectUsageCacheStore()
 
-    func placeholder(in context: Context) -> ClaudeUsageWidgetEntry {
+    func placeholder(in context: Context) -> TokenUsageMonitorWidgetEntry {
         .placeholder()
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (ClaudeUsageWidgetEntry) -> Void) {
+    func getSnapshot(in context: Context, completion: @escaping (TokenUsageMonitorWidgetEntry) -> Void) {
         if context.isPreview {
             completion(.placeholder())
             return
@@ -23,14 +23,14 @@ struct ClaudeUsageTimelineProvider: TimelineProvider {
         completion(makeEntry())
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<ClaudeUsageWidgetEntry>) -> Void) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<TokenUsageMonitorWidgetEntry>) -> Void) {
         let nextRefresh = Date().addingTimeInterval(15 * 60)
         completion(Timeline(entries: [makeEntry()], policy: .after(nextRefresh)))
     }
 
-    private func makeEntry() -> ClaudeUsageWidgetEntry {
+    private func makeEntry() -> TokenUsageMonitorWidgetEntry {
         // TEMP diagnostics: trace why the snapshot cache read fails in the appex.
-        let log = Logger(subsystem: "com.boardpro.ClaudeUsageWidget", category: "widget")
+        let log = Logger(subsystem: "me.andycao.app.tokenusagemonitor", category: "widget")
         if let url = AppGroup.snapshotFileURL {
             log.error("snapshot url: \(url.path, privacy: .public)")
             log.error("file exists: \(FileManager.default.fileExists(atPath: url.path), privacy: .public)")
@@ -44,7 +44,7 @@ struct ClaudeUsageTimelineProvider: TimelineProvider {
             log.error("snapshot url: NIL (containerURL failed)")
         }
 
-        var entry = ClaudeUsageWidgetEntry(date: Date(), snapshot: cacheStore.read())
+        var entry = TokenUsageMonitorWidgetEntry(date: Date(), snapshot: cacheStore.read())
         log.error("entry snapshot nil: \(entry.snapshot == nil, privacy: .public)")
 
         let settings = UsageSettingsStore.readShared()

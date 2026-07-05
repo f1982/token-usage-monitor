@@ -1,4 +1,4 @@
-# Claude Code Usage Widget (V0.2)
+# Token Usage Monitor (V0.2)
 
 A macOS SwiftUI app + WidgetKit widget that shows your local Claude Code usage
 (session %, weekly "All models" %, scoped model limits) and opt-in per-project
@@ -105,13 +105,13 @@ xcodegen generate
 Build and test:
 
 ```sh
-xcodebuild -project ClaudeUsageWidget.xcodeproj -scheme ClaudeUsageWidget \
+xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
   -allowProvisioningUpdates build
-xcodebuild -project ClaudeUsageWidget.xcodeproj -scheme ClaudeUsageWidget \
+xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
   -destination 'platform=macOS' -allowProvisioningUpdates test
 ```
 
-Or just open `ClaudeUsageWidget.xcodeproj` in Xcode and run.
+Or just open `TokenUsageMonitor.xcodeproj` in Xcode and run.
 
 Signing uses team `4MX24QZ69S` with automatic provisioning (the App Groups
 capability requires it). If the first CLI build fails with a missing
@@ -121,7 +121,7 @@ first pass.
 ## Using the widget
 
 1. Launch the app once (it fetches usage and caches a snapshot in the
-   `4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget` App Group container).
+   `4MX24QZ69S.group.me.andycao.app.tokenusagemonitor` App Group container).
 2. Right-click the desktop → Edit Widgets → search "Claude Code Usage" and add
    the small or medium widget.
 3. The widget reads only the cached snapshots; open the app (or leave it

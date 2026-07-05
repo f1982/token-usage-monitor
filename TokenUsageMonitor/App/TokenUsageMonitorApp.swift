@@ -2,7 +2,7 @@ import SwiftUI
 import WidgetKit
 
 @main
-struct ClaudeUsageWidgetApp: App {
+struct TokenUsageMonitorApp: App {
     @StateObject private var settingsStore: UsageSettingsStore
     @StateObject private var refreshService: UsageRefreshService
     @StateObject private var projectAnalytics: ProjectAnalyticsViewModel

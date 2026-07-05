@@ -1,7 +1,7 @@
 import Foundation
 
 enum AppGroup {
-    static let identifier = "4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget"
+    static let identifier = "4MX24QZ69S.group.me.andycao.app.tokenusagemonitor"
 
     static var containerURL: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier)

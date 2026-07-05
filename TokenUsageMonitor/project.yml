@@ -1,6 +1,6 @@
-name: ClaudeUsageWidget
+name: TokenUsageMonitor
 options:
-  bundleIdPrefix: com.boardpro
+  bundleIdPrefix: me.andycao.app
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
@@ -13,7 +13,7 @@ settings:
     ENABLE_HARDENED_RUNTIME: NO
 
 targets:
-  ClaudeUsageWidget:
+  TokenUsageMonitor:
     type: application
     platform: macOS
     sources:
@@ -21,22 +21,22 @@ targets:
       - Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.boardpro.ClaudeUsageWidget
-        PRODUCT_NAME: ClaudeUsageWidget
+        PRODUCT_BUNDLE_IDENTIFIER: me.andycao.app.tokenusagemonitor
+        PRODUCT_NAME: TokenUsageMonitor
     info:
       path: App/Info.plist
       properties:
         LSApplicationCategoryType: public.app-category.developer-tools
         NSHumanReadableCopyright: ""
     entitlements:
-      path: App/ClaudeUsageWidget.entitlements
+      path: App/TokenUsageMonitor.entitlements
       properties:
         com.apple.security.application-groups:
-          - 4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget
+          - 4MX24QZ69S.group.me.andycao.app.tokenusagemonitor
     dependencies:
-      - target: ClaudeUsageWidgetExtension
+      - target: TokenUsageMonitorExtension
 
-  ClaudeUsageWidgetExtension:
+  TokenUsageMonitorExtension:
     type: app-extension
     platform: macOS
     sources:
@@ -44,8 +44,8 @@ targets:
       - Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.boardpro.ClaudeUsageWidget.widget
-        PRODUCT_NAME: ClaudeUsageWidgetExtension
+        PRODUCT_BUNDLE_IDENTIFIER: me.andycao.app.tokenusagemonitor.widget
+        PRODUCT_NAME: TokenUsageMonitorExtension
         SKIP_INSTALL: YES
     info:
       path: Widget/Info.plist
@@ -53,13 +53,13 @@ targets:
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     entitlements:
-      path: Widget/ClaudeUsageWidgetExtension.entitlements
+      path: Widget/TokenUsageMonitorExtension.entitlements
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.application-groups:
-          - 4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget
+          - 4MX24QZ69S.group.me.andycao.app.tokenusagemonitor
 
-  ClaudeUsageWidgetTests:
+  TokenUsageMonitorTests:
     type: bundle.unit-test
     platform: macOS
     sources:
@@ -69,19 +69,19 @@ targets:
       - App/Providers
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.boardpro.ClaudeUsageWidgetTests
+        PRODUCT_BUNDLE_IDENTIFIER: me.andycao.app.tokenusagemonitor.tests
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_IDENTITY: "-"
 
 schemes:
-  ClaudeUsageWidget:
+  TokenUsageMonitor:
     build:
       targets:
-        ClaudeUsageWidget: all
-        ClaudeUsageWidgetTests: [test]
+        TokenUsageMonitor: all
+        TokenUsageMonitorTests: [test]
     run:
       config: Debug
     test:
       config: Debug
       targets:
-        - ClaudeUsageWidgetTests
+        - TokenUsageMonitorTests

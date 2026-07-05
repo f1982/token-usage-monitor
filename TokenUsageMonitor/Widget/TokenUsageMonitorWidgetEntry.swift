@@ -1,15 +1,15 @@
 import Foundation
 import WidgetKit
 
-struct ClaudeUsageWidgetEntry: TimelineEntry {
+struct TokenUsageMonitorWidgetEntry: TimelineEntry {
     let date: Date
     let snapshot: ClaudeUsageSnapshot?
     var topProjects: [ProjectUsageSummary] = []
     var projectsRange: ProjectUsageTimeRange?
     var chartStyle: UsageChartStyle = .progressBar
 
-    static func placeholder(date: Date = Date()) -> ClaudeUsageWidgetEntry {
-        ClaudeUsageWidgetEntry(
+    static func placeholder(date: Date = Date()) -> TokenUsageMonitorWidgetEntry {
+        TokenUsageMonitorWidgetEntry(
             date: date,
             snapshot: ClaudeUsageSnapshot(
                 available: true,
