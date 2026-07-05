@@ -10,6 +10,7 @@ struct SettingsView: View {
     var body: some View {
         Form {
             quotaSourceSection
+            appearanceSection
             projectAnalyticsSection
             experimentalSection
             privacySection
@@ -26,6 +27,10 @@ struct SettingsView: View {
             // The widget shows/hides its projects section based on this setting.
             WidgetCenter.shared.reloadAllTimelines()
         }
+        .onChange(of: settingsStore.settings.usageChartStyle) { _, _ in
+            // The widget renders usage in the selected chart style.
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
 
     // MARK: - Sections
@@ -40,6 +45,28 @@ struct SettingsView: View {
             Text("The official Claude Code statusline is always tried first. Fallback sources are only used when you enable them here.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    private var appearanceSection: some View {
+        Section("Usage Chart Style") {
+            Picker("Chart Style", selection: $settingsStore.settings.usageChartStyle) {
+                ForEach(UsageChartStyle.allCases) { style in
+                    Label(style.displayName, systemImage: style.systemImage).tag(style)
+                }
+            }
+            Text("Choose how each usage limit is drawn. This applies to the app overview and the widget.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            // Live preview so the choice is obvious before saving.
+            UsageMeterView(
+                limit: UsageLimit(id: "preview", kind: "preview", label: "Preview", percent: 68, resetsAt: nil),
+                style: settingsStore.settings.usageChartStyle,
+                compact: false,
+                showReset: false
+            )
+            .padding(.vertical, 4)
         }
     }
 

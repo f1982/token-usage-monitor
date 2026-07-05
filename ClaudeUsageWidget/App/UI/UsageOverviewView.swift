@@ -2,6 +2,7 @@ import SwiftUI
 
 struct UsageOverviewView: View {
     @EnvironmentObject private var refreshService: UsageRefreshService
+    @EnvironmentObject private var settingsStore: UsageSettingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -33,16 +34,17 @@ struct UsageOverviewView: View {
 
     @ViewBuilder
     private func usageCards(for snapshot: ClaudeUsageSnapshot) -> some View {
+        let style = settingsStore.settings.usageChartStyle
         if let weekly = snapshot.weekly {
-            UsageLimitRow(limit: weekly)
+            UsageLimitRow(limit: weekly, style: style)
         }
         if let session = snapshot.session {
-            UsageLimitRow(limit: session)
+            UsageLimitRow(limit: session, style: style)
         }
         if !snapshot.weeklyScoped.isEmpty {
             Divider()
             ForEach(snapshot.weeklyScoped) { limit in
-                UsageLimitRow(limit: limit)
+                UsageLimitRow(limit: limit, style: style)
             }
         }
     }

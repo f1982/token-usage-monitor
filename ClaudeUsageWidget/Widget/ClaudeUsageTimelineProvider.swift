@@ -48,6 +48,7 @@ struct ClaudeUsageTimelineProvider: TimelineProvider {
         log.error("entry snapshot nil: \(entry.snapshot == nil, privacy: .public)")
 
         let settings = UsageSettingsStore.readShared()
+        entry.chartStyle = settings.usageChartStyle
         if settings.localProjectAnalyticsEnabled, let cache = projectCacheStore.read() {
             entry.topProjects = Array(cache.summaries.prefix(Self.topProjectCount))
             entry.projectsRange = cache.timeRange

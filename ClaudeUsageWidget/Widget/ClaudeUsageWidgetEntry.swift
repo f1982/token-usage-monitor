@@ -6,6 +6,7 @@ struct ClaudeUsageWidgetEntry: TimelineEntry {
     let snapshot: ClaudeUsageSnapshot?
     var topProjects: [ProjectUsageSummary] = []
     var projectsRange: ProjectUsageTimeRange?
+    var chartStyle: UsageChartStyle = .progressBar
 
     static func placeholder(date: Date = Date()) -> ClaudeUsageWidgetEntry {
         ClaudeUsageWidgetEntry(

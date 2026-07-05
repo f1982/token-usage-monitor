@@ -119,19 +119,7 @@ struct ClaudeUsageWidgetEntryView: View {
     }
 
     private func limitRow(_ limit: UsageLimit) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack {
-                Text(limit.label)
-                    .font(.caption2)
-                    .lineLimit(1)
-                Spacer()
-                Text(UsageDisplayFormatting.shortPercentText(limit.percent))
-                    .font(.caption2)
-                    .bold()
-                    .monospacedDigit()
-            }
-            ProgressView(value: UsageDisplayFormatting.clampedPercent(limit.percent), total: 100)
-        }
+        UsageMeterView(limit: limit, style: entry.chartStyle, compact: true, showReset: false)
     }
 
     private func footer(_ snapshot: ClaudeUsageSnapshot) -> some View {

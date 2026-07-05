@@ -24,6 +24,7 @@ final class UsageSettingsStoreTests: XCTestCase {
         XCTAssertFalse(store.settings.experimentalOAuthEnabled, "experimental OAuth must default to off")
         XCTAssertEqual(store.settings.claudeProjectsPath, "~/.claude/projects")
         XCTAssertEqual(store.settings.projectAnalyticsDefaultRange, .last7Days)
+        XCTAssertEqual(store.settings.usageChartStyle, .progressBar, "chart style must default to the linear progress bar")
     }
 
     func testSettingsPersistAndReload() {
@@ -32,6 +33,7 @@ final class UsageSettingsStoreTests: XCTestCase {
         store.settings.localProjectAnalyticsEnabled = true
         store.settings.claudeProjectsPath = "~/custom/projects"
         store.settings.experimentalOAuthEnabled = true
+        store.settings.usageChartStyle = .donut
 
         let reloaded = UsageSettingsStore(defaults: defaults)
 
@@ -39,6 +41,17 @@ final class UsageSettingsStoreTests: XCTestCase {
         XCTAssertTrue(reloaded.settings.localProjectAnalyticsEnabled)
         XCTAssertEqual(reloaded.settings.claudeProjectsPath, "~/custom/projects")
         XCTAssertTrue(reloaded.settings.experimentalOAuthEnabled)
+        XCTAssertEqual(reloaded.settings.usageChartStyle, .donut)
+    }
+
+    func testMissingChartStyleFallsBackToProgressBar() {
+        // Settings persisted before this feature won't have the key.
+        let json = #"{"quotaSourceMode":"officialStatuslineOnly"}"#
+        defaults.set(Data(json.utf8), forKey: UsageSettingsStore.storageKey)
+
+        let store = UsageSettingsStore(defaults: defaults)
+
+        XCTAssertEqual(store.settings.usageChartStyle, .progressBar)
     }
 
     func testCorruptStoredSettingsFallBackToDefaults() {
