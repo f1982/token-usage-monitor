@@ -1,10 +1,10 @@
-# Agent Usage Monitor
+# Token Usage Monitor
 
 A native macOS app + desktop widget that shows your local **Claude Code** usage
 at a glance — session (5-hour) and weekly quota, scoped model limits, and
 opt-in per-project token analytics. Everything runs and stays on your machine.
 
-The app is **Token Usage Monitor**, a SwiftUI + WidgetKit project living in
+It's a SwiftUI + WidgetKit project living in
 [`TokenUsageMonitor/`](TokenUsageMonitor/).
 
 ## What it does
@@ -40,7 +40,7 @@ for the exact `~/.claude/settings.json` snippet and script.
 ## Layout
 
 ```
-agent-usage-monitor/
+token-usage-monitor/
 ├── TokenUsageMonitor/        # the macOS app + widget (XcodeGen project)
 │   ├── App/                  # SwiftUI app: UI, Providers, Services
 │   ├── Shared/               # domain models, settings, analytics, caches
