@@ -1,0 +1,885 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01D733E19886FDBB1E9C218D /* ClaudeUsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A303A112F01457A42E01FBB /* ClaudeUsageSnapshot.swift */; };
+		0748A9A299031793FE772AE4 /* ClaudeUsageWidgetEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370AE1A69E3239BD58057A49 /* ClaudeUsageWidgetEntryView.swift */; };
+		088A4AFB570187EA6404F9DD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAEE7BC38DF8A7F18F9B66D /* SettingsView.swift */; };
+		0905F902EDAFB6EB91E71686 /* UsageAggregatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410689EAF7FC86C968E79FC9 /* UsageAggregatorService.swift */; };
+		097E38851635D851BC25444B /* OAuthUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA877E5378A86E826951F8A3 /* OAuthUsageProvider.swift */; };
+		0AD3D45291DEAEF8F994DCE8 /* UsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9BF4BDB79961BEAE250386 /* UsageProvider.swift */; };
+		0F72738702550898465CE5CD /* UsageSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E2286C74AD4CF00BBEFD62 /* UsageSettingsStore.swift */; };
+		0F8A1D7B6FEC14E778193898 /* UsageCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0A46997FBCD6D9ED3B3080 /* UsageCacheStore.swift */; };
+		15FA82FE0BA720163A416498 /* ClaudeUsageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3C64376A4E9FCA70C6BB74 /* ClaudeUsageWidget.swift */; };
+		1B4549DCF73A428AB9D30F3E /* ClaudeUsageWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B71813093F86943308852F96 /* ClaudeUsageWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1C1A7AE5850E2F59C7A06C54 /* ProjectUsageCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D3167EF742DE1371A5788A0 /* ProjectUsageCacheStore.swift */; };
+		1C9E966B4A8FA4E97FA9DACF /* OAuthUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA877E5378A86E826951F8A3 /* OAuthUsageProvider.swift */; };
+		1DAA060848FC9A490344232E /* UsageDisplayFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E6CBC981590D0419F2144E0 /* UsageDisplayFormatting.swift */; };
+		1EB0EF0EC5D82A2A27A7554E /* UsageRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCBAD0794BFD4146D94247D /* UsageRefreshServiceTests.swift */; };
+		22CC266DFA6B8510745A8F3B /* UsageDisplayFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E6CBC981590D0419F2144E0 /* UsageDisplayFormatting.swift */; };
+		23214AAE4C07EF85A1DFBC70 /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188773DED74D73125573EE67 /* ProjectsView.swift */; };
+		23E98F6AFFD7EEEF67A30F14 /* ClaudeUsageWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72630E41FCD5D3C38C88F5F0 /* ClaudeUsageWidgetEntry.swift */; };
+		26CAE6FD5F469240AD211855 /* ClaudeTokenReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A29DE2117F6B66DB8C5FE1 /* ClaudeTokenReaderTests.swift */; };
+		2C8A8EAAA362047249575AAD /* ProjectUsageTimeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852AFC8E794CBE6ABAEA142A /* ProjectUsageTimeRange.swift */; };
+		2D3E69A105A8B3946F019EC1 /* ProjectUsageAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E442F69C3138502BC4B96 /* ProjectUsageAggregator.swift */; };
+		3061BF014564B0CCD3709CF1 /* UsageSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74814CB3FFCEE7C70F69B1F8 /* UsageSettings.swift */; };
+		43BEC42B77164B6CF48696FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0505C040282AEB882454DB /* ContentView.swift */; };
+		4F6D899C455F5C3091C700C1 /* UsageRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB68992052EFF3FD80DF61F1 /* UsageRefreshService.swift */; };
+		4F87B21497142C5967FB95B6 /* OAuthUsageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B8A7D8F1209CFE84147498 /* OAuthUsageProviderTests.swift */; };
+		513C7744431A5097CCD98DDE /* UsageDisplayFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282710A815C680EF931751F0 /* UsageDisplayFormattingTests.swift */; };
+		517B9A3A80BF8154A887FB4A /* ProjectUsageTimeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852AFC8E794CBE6ABAEA142A /* ProjectUsageTimeRange.swift */; };
+		52C59752A75346F25CD20E44 /* ProjectUsageAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E442F69C3138502BC4B96 /* ProjectUsageAggregator.swift */; };
+		5690E43CE5B77D621BB8A161 /* ProjectUsageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D763C6E9B05A88148FCD15B8 /* ProjectUsageParser.swift */; };
+		56C204AAADB3AA5998AA245F /* ISO8601Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B94D452821878968712238 /* ISO8601Parsing.swift */; };
+		59173FAC8D0CEA72C8F6E377 /* ClaudeUsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A303A112F01457A42E01FBB /* ClaudeUsageSnapshot.swift */; };
+		5ED2E5EEF25E483D03A7C813 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00D04AAD43F82BAAA21C84D /* AppGroup.swift */; };
+		6004115A702ED4137183C604 /* ProjectUsageTimeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852AFC8E794CBE6ABAEA142A /* ProjectUsageTimeRange.swift */; };
+		6009804130781A733EEF15ED /* ClaudeUsageClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C2B8F03B185908BF8B6D4A /* ClaudeUsageClient.swift */; };
+		61E71DDBBAD7C8ECEBD13B4E /* UsageLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7280BC14A104B4B89DBF6E0B /* UsageLimit.swift */; };
+		67BF5ADD70050C1A568EB326 /* UsageDisplayFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E6CBC981590D0419F2144E0 /* UsageDisplayFormatting.swift */; };
+		6931C9583BD600CF33247034 /* UsageRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB68992052EFF3FD80DF61F1 /* UsageRefreshService.swift */; };
+		6B9005D6E08599D17CD30AAE /* ProjectUsageCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D3167EF742DE1371A5788A0 /* ProjectUsageCacheStore.swift */; };
+		711D0C9759D3244987387399 /* UsageCacheStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E797FFA505D2544C1E0147E6 /* UsageCacheStoreTests.swift */; };
+		7A259F236112476DDD399E20 /* ClaudeTokenReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3280BEE4F5CA1B82BF6A823F /* ClaudeTokenReader.swift */; };
+		7F74E6821C8480CE3B084963 /* ProjectUsageAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E442F69C3138502BC4B96 /* ProjectUsageAggregator.swift */; };
+		7FDE9E2294F81903B849BE5B /* ClaudeUsageWidgetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DC54E79339225480FF687 /* ClaudeUsageWidgetApp.swift */; };
+		82541C291C8EBF9181F89EBC /* ProjectUsageParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700D7BD7A2EEA70FCF60995D /* ProjectUsageParserTests.swift */; };
+		83B216D679DA047570FDB154 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00D04AAD43F82BAAA21C84D /* AppGroup.swift */; };
+		8D633D46CF408CF8B7456B2F /* ProjectUsageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D763C6E9B05A88148FCD15B8 /* ProjectUsageParser.swift */; };
+		8DC0CF5BE5BE807B4938C88C /* ClaudeUsageTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD6B6FD13F5E233C455300E /* ClaudeUsageTimelineProvider.swift */; };
+		92F7D93B460DD8BFE7B4182E /* ISO8601Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B94D452821878968712238 /* ISO8601Parsing.swift */; };
+		94C1E0A7BEC26B5E5E386C06 /* LocalProjectUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE769161CF11AABFC7722D5 /* LocalProjectUsageProvider.swift */; };
+		9868E7FC790C9EF1DA000EA3 /* ProjectUsageCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D3167EF742DE1371A5788A0 /* ProjectUsageCacheStore.swift */; };
+		98FD6218588729B5D5832717 /* StatuslineUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C22E9046DA8A34B99918AE /* StatuslineUsageProvider.swift */; };
+		9924643364F396EDD7B76A43 /* ErrorNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0676B3C928E05AE9C3A16C5 /* ErrorNoteView.swift */; };
+		99693D00D8AC822F0550F8A5 /* UsageLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7280BC14A104B4B89DBF6E0B /* UsageLimit.swift */; };
+		9DFD0C0FBCE86850E004F7EB /* StatuslineUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C22E9046DA8A34B99918AE /* StatuslineUsageProvider.swift */; };
+		9EDDB8104AE6399E9B26E934 /* UsageLimitRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C03335376212D5291EAD45 /* UsageLimitRow.swift */; };
+		AE5F27F326A60B879227F4EC /* ClaudeUsageClientMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0265FFA1AAB7C87460864C65 /* ClaudeUsageClientMappingTests.swift */; };
+		AE6F1042ACC0516E3581BACC /* UsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9BF4BDB79961BEAE250386 /* UsageProvider.swift */; };
+		B2A623A618F6BF7420DE6C9B /* ProjectUsageCacheStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F6496708EC8C0C7991308E /* ProjectUsageCacheStoreTests.swift */; };
+		B379AB9056D4FCDFB9E5D734 /* UsageCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0A46997FBCD6D9ED3B3080 /* UsageCacheStore.swift */; };
+		BBAF10A7B3019126BA10FBEE /* ClaudeTokenReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3280BEE4F5CA1B82BF6A823F /* ClaudeTokenReader.swift */; };
+		BE8C7EFC4879147EDB28D547 /* ProjectUsageEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F7B83A1E70D78E2B212C256 /* ProjectUsageEvent.swift */; };
+		C2610BEABDF75BA6E8704D95 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00D04AAD43F82BAAA21C84D /* AppGroup.swift */; };
+		C796E18A26AC45B7CBC393FE /* LocalProjectUsageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249CCDF3C351ADAAAE2E5652 /* LocalProjectUsageProviderTests.swift */; };
+		C7E80B2FE8DF84C8F726B137 /* UsageSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74814CB3FFCEE7C70F69B1F8 /* UsageSettings.swift */; };
+		CC3257A8CF9E7467AE6A4B43 /* ProjectAnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5E828165D28D6C4FC6BAB7 /* ProjectAnalyticsViewModel.swift */; };
+		CE1EEC1DB4CE4676F6AA61C4 /* ClaudeUsageWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263B79D4150B25A657B1848E /* ClaudeUsageWidgetBundle.swift */; };
+		D030310D9BCBC485A4A8289F /* UsageLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7280BC14A104B4B89DBF6E0B /* UsageLimit.swift */; };
+		D7C2CD7EF039B8B48C7A1977 /* ProjectUsageEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F7B83A1E70D78E2B212C256 /* ProjectUsageEvent.swift */; };
+		D98D1151AEC67FF7B6639A3B /* UsageSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74814CB3FFCEE7C70F69B1F8 /* UsageSettings.swift */; };
+		DDCB461A14D223A766AC45DA /* ClaudeUsageClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C2B8F03B185908BF8B6D4A /* ClaudeUsageClient.swift */; };
+		E1BDE752A9983FFC4D0D92C2 /* UsageCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0A46997FBCD6D9ED3B3080 /* UsageCacheStore.swift */; };
+		E262AEC57C5CC1261A13CED6 /* UsageOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537081EBB7B19AA5F9543E6E /* UsageOverviewView.swift */; };
+		E36C27584A47602CE6878F7F /* UsageSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E2286C74AD4CF00BBEFD62 /* UsageSettingsStore.swift */; };
+		E4DC7D1E1813BC926E8BCB23 /* ProjectUsageEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F7B83A1E70D78E2B212C256 /* ProjectUsageEvent.swift */; };
+		EB4745A37E1008358704619A /* UsageSettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A758437DDC223B346E75FF1E /* UsageSettingsStoreTests.swift */; };
+		ECCF4A0A88D944EA191485D3 /* UsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9BF4BDB79961BEAE250386 /* UsageProvider.swift */; };
+		F012382C019570031A7971A5 /* UsageAggregatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410689EAF7FC86C968E79FC9 /* UsageAggregatorService.swift */; };
+		F0C5066428B05399CF621884 /* LocalProjectUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE769161CF11AABFC7722D5 /* LocalProjectUsageProvider.swift */; };
+		F1EA458862205A743F1E0D06 /* StatuslineUsageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80D3F5CEC4D3B9AF3463ED4 /* StatuslineUsageProviderTests.swift */; };
+		F2741F6713FEE23724A48EBF /* ProjectUsageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D763C6E9B05A88148FCD15B8 /* ProjectUsageParser.swift */; };
+		F38BD2C9220AEAD5BDCC9BC9 /* ProjectAnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5E828165D28D6C4FC6BAB7 /* ProjectAnalyticsViewModel.swift */; };
+		F60C6D1B4AB1F0B68D55C210 /* UsageSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E2286C74AD4CF00BBEFD62 /* UsageSettingsStore.swift */; };
+		F82CCFE6D6FC777AF2976E9C /* ProjectUsageAggregatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035FE44102FBE6AE9487D39D /* ProjectUsageAggregatorTests.swift */; };
+		F8B65300223D74C18AFB2CE6 /* ISO8601Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B94D452821878968712238 /* ISO8601Parsing.swift */; };
+		FBD1C0B6C17EFF13627D1DC9 /* UsageAggregatorServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460353D5CD32956E5C1FFACF /* UsageAggregatorServiceTests.swift */; };
+		FF5352A60440CEDC9C0B3AF3 /* ClaudeUsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A303A112F01457A42E01FBB /* ClaudeUsageSnapshot.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9644176A865CABC0F4492F29 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 79E0D1F8E1CDBC4EE8A1F043 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8800B081469EBCD359EAF9E8;
+			remoteInfo = ClaudeUsageWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FD232F5BA9028C75D007E8AC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1B4549DCF73A428AB9D30F3E /* ClaudeUsageWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0265FFA1AAB7C87460864C65 /* ClaudeUsageClientMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageClientMappingTests.swift; sourceTree = "<group>"; };
+		035FE44102FBE6AE9487D39D /* ProjectUsageAggregatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageAggregatorTests.swift; sourceTree = "<group>"; };
+		07C03335376212D5291EAD45 /* UsageLimitRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageLimitRow.swift; sourceTree = "<group>"; };
+		0C0A46997FBCD6D9ED3B3080 /* UsageCacheStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageCacheStore.swift; sourceTree = "<group>"; };
+		0C0DC54E79339225480FF687 /* ClaudeUsageWidgetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageWidgetApp.swift; sourceTree = "<group>"; };
+		188773DED74D73125573EE67 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
+		249CCDF3C351ADAAAE2E5652 /* LocalProjectUsageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalProjectUsageProviderTests.swift; sourceTree = "<group>"; };
+		263B79D4150B25A657B1848E /* ClaudeUsageWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageWidgetBundle.swift; sourceTree = "<group>"; };
+		282710A815C680EF931751F0 /* UsageDisplayFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageDisplayFormattingTests.swift; sourceTree = "<group>"; };
+		3280BEE4F5CA1B82BF6A823F /* ClaudeTokenReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeTokenReader.swift; sourceTree = "<group>"; };
+		370AE1A69E3239BD58057A49 /* ClaudeUsageWidgetEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageWidgetEntryView.swift; sourceTree = "<group>"; };
+		3F7B83A1E70D78E2B212C256 /* ProjectUsageEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageEvent.swift; sourceTree = "<group>"; };
+		410689EAF7FC86C968E79FC9 /* UsageAggregatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageAggregatorService.swift; sourceTree = "<group>"; };
+		460353D5CD32956E5C1FFACF /* UsageAggregatorServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageAggregatorServiceTests.swift; sourceTree = "<group>"; };
+		4CAEE7BC38DF8A7F18F9B66D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		50B8A7D8F1209CFE84147498 /* OAuthUsageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthUsageProviderTests.swift; sourceTree = "<group>"; };
+		537081EBB7B19AA5F9543E6E /* UsageOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageOverviewView.swift; sourceTree = "<group>"; };
+		58B722BBD73039680155A5B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5A303A112F01457A42E01FBB /* ClaudeUsageSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageSnapshot.swift; sourceTree = "<group>"; };
+		69F6496708EC8C0C7991308E /* ProjectUsageCacheStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageCacheStoreTests.swift; sourceTree = "<group>"; };
+		6B5E828165D28D6C4FC6BAB7 /* ProjectAnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectAnalyticsViewModel.swift; sourceTree = "<group>"; };
+		6D0505C040282AEB882454DB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		700D7BD7A2EEA70FCF60995D /* ProjectUsageParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageParserTests.swift; sourceTree = "<group>"; };
+		72630E41FCD5D3C38C88F5F0 /* ClaudeUsageWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageWidgetEntry.swift; sourceTree = "<group>"; };
+		7280BC14A104B4B89DBF6E0B /* UsageLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageLimit.swift; sourceTree = "<group>"; };
+		74814CB3FFCEE7C70F69B1F8 /* UsageSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSettings.swift; sourceTree = "<group>"; };
+		7E6CBC981590D0419F2144E0 /* UsageDisplayFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageDisplayFormatting.swift; sourceTree = "<group>"; };
+		81C22E9046DA8A34B99918AE /* StatuslineUsageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatuslineUsageProvider.swift; sourceTree = "<group>"; };
+		852AFC8E794CBE6ABAEA142A /* ProjectUsageTimeRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageTimeRange.swift; sourceTree = "<group>"; };
+		8D3167EF742DE1371A5788A0 /* ProjectUsageCacheStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageCacheStore.swift; sourceTree = "<group>"; };
+		96E2286C74AD4CF00BBEFD62 /* UsageSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSettingsStore.swift; sourceTree = "<group>"; };
+		9E01D3701A2C82768E4A7BDD /* ClaudeUsageWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClaudeUsageWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A689E324C8FB1D63AF114D18 /* ClaudeUsageWidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClaudeUsageWidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A758437DDC223B346E75FF1E /* UsageSettingsStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSettingsStoreTests.swift; sourceTree = "<group>"; };
+		B71813093F86943308852F96 /* ClaudeUsageWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ClaudeUsageWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B80D3F5CEC4D3B9AF3463ED4 /* StatuslineUsageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatuslineUsageProviderTests.swift; sourceTree = "<group>"; };
+		BCCBAD0794BFD4146D94247D /* UsageRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageRefreshServiceTests.swift; sourceTree = "<group>"; };
+		BD2703243E2DDC47258406BD /* ClaudeUsageWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClaudeUsageWidgetExtension.entitlements; sourceTree = "<group>"; };
+		C04E442F69C3138502BC4B96 /* ProjectUsageAggregator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageAggregator.swift; sourceTree = "<group>"; };
+		C0676B3C928E05AE9C3A16C5 /* ErrorNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorNoteView.swift; sourceTree = "<group>"; };
+		CF9BF4BDB79961BEAE250386 /* UsageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageProvider.swift; sourceTree = "<group>"; };
+		D00D04AAD43F82BAAA21C84D /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
+		D3A821CF9308006BC338ECDD /* ClaudeUsageWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClaudeUsageWidget.entitlements; sourceTree = "<group>"; };
+		D763C6E9B05A88148FCD15B8 /* ProjectUsageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectUsageParser.swift; sourceTree = "<group>"; };
+		DB68992052EFF3FD80DF61F1 /* UsageRefreshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageRefreshService.swift; sourceTree = "<group>"; };
+		E3C2B8F03B185908BF8B6D4A /* ClaudeUsageClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageClient.swift; sourceTree = "<group>"; };
+		E7461ED52B3E3AAD8992BF27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E797FFA505D2544C1E0147E6 /* UsageCacheStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageCacheStoreTests.swift; sourceTree = "<group>"; };
+		EA3C64376A4E9FCA70C6BB74 /* ClaudeUsageWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageWidget.swift; sourceTree = "<group>"; };
+		EA877E5378A86E826951F8A3 /* OAuthUsageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthUsageProvider.swift; sourceTree = "<group>"; };
+		EAE769161CF11AABFC7722D5 /* LocalProjectUsageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalProjectUsageProvider.swift; sourceTree = "<group>"; };
+		EDD6B6FD13F5E233C455300E /* ClaudeUsageTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageTimelineProvider.swift; sourceTree = "<group>"; };
+		F1B94D452821878968712238 /* ISO8601Parsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISO8601Parsing.swift; sourceTree = "<group>"; };
+		F3A29DE2117F6B66DB8C5FE1 /* ClaudeTokenReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeTokenReaderTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		15B275ACC65F45E3D744B1AC /* ProjectAnalytics */ = {
+			isa = PBXGroup;
+			children = (
+				C04E442F69C3138502BC4B96 /* ProjectUsageAggregator.swift */,
+				3F7B83A1E70D78E2B212C256 /* ProjectUsageEvent.swift */,
+				D763C6E9B05A88148FCD15B8 /* ProjectUsageParser.swift */,
+				852AFC8E794CBE6ABAEA142A /* ProjectUsageTimeRange.swift */,
+			);
+			path = ProjectAnalytics;
+			sourceTree = "<group>";
+		};
+		1F6324A13965BFFE23E9C132 = {
+			isa = PBXGroup;
+			children = (
+				F25912942BEC7B50A350D4D1 /* App */,
+				C90F0966D88AE92C9B94658C /* Shared */,
+				71D6E5913C7DA8C69F6BCA07 /* Tests */,
+				A04B6D10B0BDDC8705700899 /* Widget */,
+				FA0BB028800489CAF53C9983 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		33E072BBE56ADAB198B68620 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3280BEE4F5CA1B82BF6A823F /* ClaudeTokenReader.swift */,
+				E3C2B8F03B185908BF8B6D4A /* ClaudeUsageClient.swift */,
+				6B5E828165D28D6C4FC6BAB7 /* ProjectAnalyticsViewModel.swift */,
+				410689EAF7FC86C968E79FC9 /* UsageAggregatorService.swift */,
+				DB68992052EFF3FD80DF61F1 /* UsageRefreshService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		4BADC45F706CE8D434D1B563 /* DomainTests */ = {
+			isa = PBXGroup;
+			children = (
+				282710A815C680EF931751F0 /* UsageDisplayFormattingTests.swift */,
+			);
+			path = DomainTests;
+			sourceTree = "<group>";
+		};
+		505DFC42E029CD4C8C89D39C /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				D00D04AAD43F82BAAA21C84D /* AppGroup.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		5E3CE0B04E4A739635A9FE2F /* SettingsTests */ = {
+			isa = PBXGroup;
+			children = (
+				A758437DDC223B346E75FF1E /* UsageSettingsStoreTests.swift */,
+			);
+			path = SettingsTests;
+			sourceTree = "<group>";
+		};
+		636509009E335C4823297D61 /* StorageTests */ = {
+			isa = PBXGroup;
+			children = (
+				69F6496708EC8C0C7991308E /* ProjectUsageCacheStoreTests.swift */,
+				E797FFA505D2544C1E0147E6 /* UsageCacheStoreTests.swift */,
+			);
+			path = StorageTests;
+			sourceTree = "<group>";
+		};
+		67F6C20592C1ADBE6BE3290C /* ServiceTests */ = {
+			isa = PBXGroup;
+			children = (
+				F3A29DE2117F6B66DB8C5FE1 /* ClaudeTokenReaderTests.swift */,
+				0265FFA1AAB7C87460864C65 /* ClaudeUsageClientMappingTests.swift */,
+				460353D5CD32956E5C1FFACF /* UsageAggregatorServiceTests.swift */,
+				BCCBAD0794BFD4146D94247D /* UsageRefreshServiceTests.swift */,
+			);
+			path = ServiceTests;
+			sourceTree = "<group>";
+		};
+		6972B5F741680AE041967BCB /* ProviderTests */ = {
+			isa = PBXGroup;
+			children = (
+				249CCDF3C351ADAAAE2E5652 /* LocalProjectUsageProviderTests.swift */,
+				50B8A7D8F1209CFE84147498 /* OAuthUsageProviderTests.swift */,
+				B80D3F5CEC4D3B9AF3463ED4 /* StatuslineUsageProviderTests.swift */,
+			);
+			path = ProviderTests;
+			sourceTree = "<group>";
+		};
+		71D6E5913C7DA8C69F6BCA07 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4BADC45F706CE8D434D1B563 /* DomainTests */,
+				FBE00823F7546BFCCA1936D8 /* ProjectAnalyticsTests */,
+				6972B5F741680AE041967BCB /* ProviderTests */,
+				67F6C20592C1ADBE6BE3290C /* ServiceTests */,
+				5E3CE0B04E4A739635A9FE2F /* SettingsTests */,
+				636509009E335C4823297D61 /* StorageTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		8698C9E3C218BF9B2D35D165 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				6D0505C040282AEB882454DB /* ContentView.swift */,
+				C0676B3C928E05AE9C3A16C5 /* ErrorNoteView.swift */,
+				188773DED74D73125573EE67 /* ProjectsView.swift */,
+				4CAEE7BC38DF8A7F18F9B66D /* SettingsView.swift */,
+				07C03335376212D5291EAD45 /* UsageLimitRow.swift */,
+				537081EBB7B19AA5F9543E6E /* UsageOverviewView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		906136755F880964D2AD2D52 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				5A303A112F01457A42E01FBB /* ClaudeUsageSnapshot.swift */,
+				F1B94D452821878968712238 /* ISO8601Parsing.swift */,
+				7E6CBC981590D0419F2144E0 /* UsageDisplayFormatting.swift */,
+				7280BC14A104B4B89DBF6E0B /* UsageLimit.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		9BA01A41439808E92AAD85C6 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				EAE769161CF11AABFC7722D5 /* LocalProjectUsageProvider.swift */,
+				EA877E5378A86E826951F8A3 /* OAuthUsageProvider.swift */,
+				81C22E9046DA8A34B99918AE /* StatuslineUsageProvider.swift */,
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		A04B6D10B0BDDC8705700899 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				EDD6B6FD13F5E233C455300E /* ClaudeUsageTimelineProvider.swift */,
+				EA3C64376A4E9FCA70C6BB74 /* ClaudeUsageWidget.swift */,
+				263B79D4150B25A657B1848E /* ClaudeUsageWidgetBundle.swift */,
+				72630E41FCD5D3C38C88F5F0 /* ClaudeUsageWidgetEntry.swift */,
+				370AE1A69E3239BD58057A49 /* ClaudeUsageWidgetEntryView.swift */,
+				BD2703243E2DDC47258406BD /* ClaudeUsageWidgetExtension.entitlements */,
+				E7461ED52B3E3AAD8992BF27 /* Info.plist */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		C90F0966D88AE92C9B94658C /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				505DFC42E029CD4C8C89D39C /* Constants */,
+				906136755F880964D2AD2D52 /* Domain */,
+				15B275ACC65F45E3D744B1AC /* ProjectAnalytics */,
+				F10084F5148EE13C878E95FA /* Providers */,
+				C9D3779369DBD18542E4C2AF /* Settings */,
+				FD38FA090894F86847161E66 /* Storage */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		C9D3779369DBD18542E4C2AF /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				74814CB3FFCEE7C70F69B1F8 /* UsageSettings.swift */,
+				96E2286C74AD4CF00BBEFD62 /* UsageSettingsStore.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		F10084F5148EE13C878E95FA /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				CF9BF4BDB79961BEAE250386 /* UsageProvider.swift */,
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		F25912942BEC7B50A350D4D1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				D3A821CF9308006BC338ECDD /* ClaudeUsageWidget.entitlements */,
+				0C0DC54E79339225480FF687 /* ClaudeUsageWidgetApp.swift */,
+				58B722BBD73039680155A5B4 /* Info.plist */,
+				9BA01A41439808E92AAD85C6 /* Providers */,
+				33E072BBE56ADAB198B68620 /* Services */,
+				8698C9E3C218BF9B2D35D165 /* UI */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		FA0BB028800489CAF53C9983 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9E01D3701A2C82768E4A7BDD /* ClaudeUsageWidget.app */,
+				B71813093F86943308852F96 /* ClaudeUsageWidgetExtension.appex */,
+				A689E324C8FB1D63AF114D18 /* ClaudeUsageWidgetTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FBE00823F7546BFCCA1936D8 /* ProjectAnalyticsTests */ = {
+			isa = PBXGroup;
+			children = (
+				035FE44102FBE6AE9487D39D /* ProjectUsageAggregatorTests.swift */,
+				700D7BD7A2EEA70FCF60995D /* ProjectUsageParserTests.swift */,
+			);
+			path = ProjectAnalyticsTests;
+			sourceTree = "<group>";
+		};
+		FD38FA090894F86847161E66 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				8D3167EF742DE1371A5788A0 /* ProjectUsageCacheStore.swift */,
+				0C0A46997FBCD6D9ED3B3080 /* UsageCacheStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5EFC43076EF4702168F3AF84 /* ClaudeUsageWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB485544E6BF0B3BAA13C463 /* Build configuration list for PBXNativeTarget "ClaudeUsageWidget" */;
+			buildPhases = (
+				7E31BB25CCA0A22EC295B63E /* Sources */,
+				FD232F5BA9028C75D007E8AC /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DCF2DB76E2A6FC5B01696F25 /* PBXTargetDependency */,
+			);
+			name = ClaudeUsageWidget;
+			packageProductDependencies = (
+			);
+			productName = ClaudeUsageWidget;
+			productReference = 9E01D3701A2C82768E4A7BDD /* ClaudeUsageWidget.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8800B081469EBCD359EAF9E8 /* ClaudeUsageWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9124D165AE7035E5C088269A /* Build configuration list for PBXNativeTarget "ClaudeUsageWidgetExtension" */;
+			buildPhases = (
+				C864319068F42469D274D02D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ClaudeUsageWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = ClaudeUsageWidgetExtension;
+			productReference = B71813093F86943308852F96 /* ClaudeUsageWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A18637C8A420F00281D837F7 /* ClaudeUsageWidgetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBF9AD3FC2044FCBC4D7CFA6 /* Build configuration list for PBXNativeTarget "ClaudeUsageWidgetTests" */;
+			buildPhases = (
+				9F87ED47FBEF850407CB560E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ClaudeUsageWidgetTests;
+			packageProductDependencies = (
+			);
+			productName = ClaudeUsageWidgetTests;
+			productReference = A689E324C8FB1D63AF114D18 /* ClaudeUsageWidgetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		79E0D1F8E1CDBC4EE8A1F043 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					5EFC43076EF4702168F3AF84 = {
+						DevelopmentTeam = 4MX24QZ69S;
+						ProvisioningStyle = Automatic;
+					};
+					8800B081469EBCD359EAF9E8 = {
+						DevelopmentTeam = 4MX24QZ69S;
+						ProvisioningStyle = Automatic;
+					};
+					A18637C8A420F00281D837F7 = {
+						DevelopmentTeam = 4MX24QZ69S;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = EFE73463400079117C337BBB /* Build configuration list for PBXProject "ClaudeUsageWidget" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1F6324A13965BFFE23E9C132;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FA0BB028800489CAF53C9983 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5EFC43076EF4702168F3AF84 /* ClaudeUsageWidget */,
+				8800B081469EBCD359EAF9E8 /* ClaudeUsageWidgetExtension */,
+				A18637C8A420F00281D837F7 /* ClaudeUsageWidgetTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7E31BB25CCA0A22EC295B63E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ED2E5EEF25E483D03A7C813 /* AppGroup.swift in Sources */,
+				BBAF10A7B3019126BA10FBEE /* ClaudeTokenReader.swift in Sources */,
+				6009804130781A733EEF15ED /* ClaudeUsageClient.swift in Sources */,
+				01D733E19886FDBB1E9C218D /* ClaudeUsageSnapshot.swift in Sources */,
+				7FDE9E2294F81903B849BE5B /* ClaudeUsageWidgetApp.swift in Sources */,
+				43BEC42B77164B6CF48696FB /* ContentView.swift in Sources */,
+				9924643364F396EDD7B76A43 /* ErrorNoteView.swift in Sources */,
+				92F7D93B460DD8BFE7B4182E /* ISO8601Parsing.swift in Sources */,
+				F0C5066428B05399CF621884 /* LocalProjectUsageProvider.swift in Sources */,
+				097E38851635D851BC25444B /* OAuthUsageProvider.swift in Sources */,
+				F38BD2C9220AEAD5BDCC9BC9 /* ProjectAnalyticsViewModel.swift in Sources */,
+				52C59752A75346F25CD20E44 /* ProjectUsageAggregator.swift in Sources */,
+				9868E7FC790C9EF1DA000EA3 /* ProjectUsageCacheStore.swift in Sources */,
+				E4DC7D1E1813BC926E8BCB23 /* ProjectUsageEvent.swift in Sources */,
+				5690E43CE5B77D621BB8A161 /* ProjectUsageParser.swift in Sources */,
+				6004115A702ED4137183C604 /* ProjectUsageTimeRange.swift in Sources */,
+				23214AAE4C07EF85A1DFBC70 /* ProjectsView.swift in Sources */,
+				088A4AFB570187EA6404F9DD /* SettingsView.swift in Sources */,
+				98FD6218588729B5D5832717 /* StatuslineUsageProvider.swift in Sources */,
+				0905F902EDAFB6EB91E71686 /* UsageAggregatorService.swift in Sources */,
+				B379AB9056D4FCDFB9E5D734 /* UsageCacheStore.swift in Sources */,
+				22CC266DFA6B8510745A8F3B /* UsageDisplayFormatting.swift in Sources */,
+				61E71DDBBAD7C8ECEBD13B4E /* UsageLimit.swift in Sources */,
+				9EDDB8104AE6399E9B26E934 /* UsageLimitRow.swift in Sources */,
+				E262AEC57C5CC1261A13CED6 /* UsageOverviewView.swift in Sources */,
+				ECCF4A0A88D944EA191485D3 /* UsageProvider.swift in Sources */,
+				4F6D899C455F5C3091C700C1 /* UsageRefreshService.swift in Sources */,
+				D98D1151AEC67FF7B6639A3B /* UsageSettings.swift in Sources */,
+				F60C6D1B4AB1F0B68D55C210 /* UsageSettingsStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F87ED47FBEF850407CB560E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83B216D679DA047570FDB154 /* AppGroup.swift in Sources */,
+				7A259F236112476DDD399E20 /* ClaudeTokenReader.swift in Sources */,
+				26CAE6FD5F469240AD211855 /* ClaudeTokenReaderTests.swift in Sources */,
+				DDCB461A14D223A766AC45DA /* ClaudeUsageClient.swift in Sources */,
+				AE5F27F326A60B879227F4EC /* ClaudeUsageClientMappingTests.swift in Sources */,
+				FF5352A60440CEDC9C0B3AF3 /* ClaudeUsageSnapshot.swift in Sources */,
+				F8B65300223D74C18AFB2CE6 /* ISO8601Parsing.swift in Sources */,
+				94C1E0A7BEC26B5E5E386C06 /* LocalProjectUsageProvider.swift in Sources */,
+				C796E18A26AC45B7CBC393FE /* LocalProjectUsageProviderTests.swift in Sources */,
+				1C9E966B4A8FA4E97FA9DACF /* OAuthUsageProvider.swift in Sources */,
+				4F87B21497142C5967FB95B6 /* OAuthUsageProviderTests.swift in Sources */,
+				CC3257A8CF9E7467AE6A4B43 /* ProjectAnalyticsViewModel.swift in Sources */,
+				2D3E69A105A8B3946F019EC1 /* ProjectUsageAggregator.swift in Sources */,
+				F82CCFE6D6FC777AF2976E9C /* ProjectUsageAggregatorTests.swift in Sources */,
+				1C1A7AE5850E2F59C7A06C54 /* ProjectUsageCacheStore.swift in Sources */,
+				B2A623A618F6BF7420DE6C9B /* ProjectUsageCacheStoreTests.swift in Sources */,
+				D7C2CD7EF039B8B48C7A1977 /* ProjectUsageEvent.swift in Sources */,
+				8D633D46CF408CF8B7456B2F /* ProjectUsageParser.swift in Sources */,
+				82541C291C8EBF9181F89EBC /* ProjectUsageParserTests.swift in Sources */,
+				2C8A8EAAA362047249575AAD /* ProjectUsageTimeRange.swift in Sources */,
+				9DFD0C0FBCE86850E004F7EB /* StatuslineUsageProvider.swift in Sources */,
+				F1EA458862205A743F1E0D06 /* StatuslineUsageProviderTests.swift in Sources */,
+				F012382C019570031A7971A5 /* UsageAggregatorService.swift in Sources */,
+				FBD1C0B6C17EFF13627D1DC9 /* UsageAggregatorServiceTests.swift in Sources */,
+				0F8A1D7B6FEC14E778193898 /* UsageCacheStore.swift in Sources */,
+				711D0C9759D3244987387399 /* UsageCacheStoreTests.swift in Sources */,
+				67BF5ADD70050C1A568EB326 /* UsageDisplayFormatting.swift in Sources */,
+				513C7744431A5097CCD98DDE /* UsageDisplayFormattingTests.swift in Sources */,
+				99693D00D8AC822F0550F8A5 /* UsageLimit.swift in Sources */,
+				0AD3D45291DEAEF8F994DCE8 /* UsageProvider.swift in Sources */,
+				6931C9583BD600CF33247034 /* UsageRefreshService.swift in Sources */,
+				1EB0EF0EC5D82A2A27A7554E /* UsageRefreshServiceTests.swift in Sources */,
+				C7E80B2FE8DF84C8F726B137 /* UsageSettings.swift in Sources */,
+				E36C27584A47602CE6878F7F /* UsageSettingsStore.swift in Sources */,
+				EB4745A37E1008358704619A /* UsageSettingsStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C864319068F42469D274D02D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2610BEABDF75BA6E8704D95 /* AppGroup.swift in Sources */,
+				59173FAC8D0CEA72C8F6E377 /* ClaudeUsageSnapshot.swift in Sources */,
+				8DC0CF5BE5BE807B4938C88C /* ClaudeUsageTimelineProvider.swift in Sources */,
+				15FA82FE0BA720163A416498 /* ClaudeUsageWidget.swift in Sources */,
+				CE1EEC1DB4CE4676F6AA61C4 /* ClaudeUsageWidgetBundle.swift in Sources */,
+				23E98F6AFFD7EEEF67A30F14 /* ClaudeUsageWidgetEntry.swift in Sources */,
+				0748A9A299031793FE772AE4 /* ClaudeUsageWidgetEntryView.swift in Sources */,
+				56C204AAADB3AA5998AA245F /* ISO8601Parsing.swift in Sources */,
+				7F74E6821C8480CE3B084963 /* ProjectUsageAggregator.swift in Sources */,
+				6B9005D6E08599D17CD30AAE /* ProjectUsageCacheStore.swift in Sources */,
+				BE8C7EFC4879147EDB28D547 /* ProjectUsageEvent.swift in Sources */,
+				F2741F6713FEE23724A48EBF /* ProjectUsageParser.swift in Sources */,
+				517B9A3A80BF8154A887FB4A /* ProjectUsageTimeRange.swift in Sources */,
+				E1BDE752A9983FFC4D0D92C2 /* UsageCacheStore.swift in Sources */,
+				1DAA060848FC9A490344232E /* UsageDisplayFormatting.swift in Sources */,
+				D030310D9BCBC485A4A8289F /* UsageLimit.swift in Sources */,
+				AE6F1042ACC0516E3581BACC /* UsageProvider.swift in Sources */,
+				3061BF014564B0CCD3709CF1 /* UsageSettings.swift in Sources */,
+				0F72738702550898465CE5CD /* UsageSettingsStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DCF2DB76E2A6FC5B01696F25 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8800B081469EBCD359EAF9E8 /* ClaudeUsageWidgetExtension */;
+			targetProxy = 9644176A865CABC0F4492F29 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5BB19464183B6C9D3A1E3ECB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/ClaudeUsageWidgetExtension.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boardpro.ClaudeUsageWidget.widget;
+				PRODUCT_NAME = ClaudeUsageWidgetExtension;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		5F51FD1DB1098624EF6D3FE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4MX24QZ69S;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		620D19A074D60D82BA570AD5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boardpro.ClaudeUsageWidgetTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		668D315158E7F830A86D3440 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boardpro.ClaudeUsageWidgetTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		67F62AA1CAEE6158B2FD8EC0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/ClaudeUsageWidget.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boardpro.ClaudeUsageWidget;
+				PRODUCT_NAME = ClaudeUsageWidget;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		9BBBD48D90B957173D67E15A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/ClaudeUsageWidgetExtension.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boardpro.ClaudeUsageWidget.widget;
+				PRODUCT_NAME = ClaudeUsageWidgetExtension;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		A5B297C84DB2BA85EC261B36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/ClaudeUsageWidget.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boardpro.ClaudeUsageWidget;
+				PRODUCT_NAME = ClaudeUsageWidget;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D90F056B33864ED9AD13421E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 4MX24QZ69S;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9124D165AE7035E5C088269A /* Build configuration list for PBXNativeTarget "ClaudeUsageWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BB19464183B6C9D3A1E3ECB /* Debug */,
+				9BBBD48D90B957173D67E15A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DB485544E6BF0B3BAA13C463 /* Build configuration list for PBXNativeTarget "ClaudeUsageWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				67F62AA1CAEE6158B2FD8EC0 /* Debug */,
+				A5B297C84DB2BA85EC261B36 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DBF9AD3FC2044FCBC4D7CFA6 /* Build configuration list for PBXNativeTarget "ClaudeUsageWidgetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				620D19A074D60D82BA570AD5 /* Debug */,
+				668D315158E7F830A86D3440 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EFE73463400079117C337BBB /* Build configuration list for PBXProject "ClaudeUsageWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D90F056B33864ED9AD13421E /* Debug */,
+				5F51FD1DB1098624EF6D3FE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 79E0D1F8E1CDBC4EE8A1F043 /* Project object */;
+}

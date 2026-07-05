@@ -1,0 +1,87 @@
+name: ClaudeUsageWidget
+options:
+  bundleIdPrefix: com.boardpro
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: 4MX24QZ69S
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: NO
+
+targets:
+  ClaudeUsageWidget:
+    type: application
+    platform: macOS
+    sources:
+      - App
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.boardpro.ClaudeUsageWidget
+        PRODUCT_NAME: ClaudeUsageWidget
+    info:
+      path: App/Info.plist
+      properties:
+        LSApplicationCategoryType: public.app-category.developer-tools
+        NSHumanReadableCopyright: ""
+    entitlements:
+      path: App/ClaudeUsageWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - 4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget
+    dependencies:
+      - target: ClaudeUsageWidgetExtension
+
+  ClaudeUsageWidgetExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - Widget
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.boardpro.ClaudeUsageWidget.widget
+        PRODUCT_NAME: ClaudeUsageWidgetExtension
+        SKIP_INSTALL: YES
+    info:
+      path: Widget/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widget/ClaudeUsageWidgetExtension.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.application-groups:
+          - 4MX24QZ69S.group.com.boardpro.ClaudeUsageWidget
+
+  ClaudeUsageWidgetTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests
+      - Shared
+      - App/Services
+      - App/Providers
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.boardpro.ClaudeUsageWidgetTests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_IDENTITY: "-"
+
+schemes:
+  ClaudeUsageWidget:
+    build:
+      targets:
+        ClaudeUsageWidget: all
+        ClaudeUsageWidgetTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - ClaudeUsageWidgetTests
