@@ -29,9 +29,11 @@ struct UsageMeterView: View {
     private var progressBarBody: some View {
         VStack(alignment: .leading, spacing: compact ? 2 : 4) {
             header
-            ProgressView(value: clampedPercent, total: 100)
-                .tint(tint)
-            resetLabel
+            // Explicit-fill capsule instead of `ProgressView`: the system-drawn
+            // ProgressView loses its tint and renders all-gray when the widget
+            // is inactive (desaturated rendering). Explicit fills survive it.
+            MeterBar(fraction: clampedPercent / 100, tint: tint, height: compact ? 6 : 9)
+            resetView
         }
     }
 
@@ -62,7 +64,7 @@ struct UsageMeterView: View {
                     .bold()
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
-                resetLabel
+                resetView
             }
             Spacer(minLength: 0)
         }
@@ -93,7 +95,7 @@ struct UsageMeterView: View {
                 Text(limit.label)
                     .font(compact ? .caption2 : .headline)
                     .lineLimit(1)
-                resetLabel
+                resetView
             }
             Spacer(minLength: 0)
         }
@@ -124,7 +126,7 @@ struct UsageMeterView: View {
                     Text("\(Int(remainingPercent.rounded()))% left")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    resetLabel
+                    resetView
                 }
             }
             Spacer(minLength: 0)
@@ -147,12 +149,33 @@ struct UsageMeterView: View {
         }
     }
 
+    /// Reset countdown: a thin depleting bar (full = window just started,
+    /// empty = reset due) paired with a "resets in 3d 5h" caption. The bar is
+    /// only drawn when the window length for this limit is known.
     @ViewBuilder
-    private var resetLabel: some View {
-        if showReset, let resetText = UsageDisplayFormatting.resetText(for: limit.resetsAt) {
-            Text(resetText)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    private var resetView: some View {
+        if showReset, let countdown = UsageDisplayFormatting.resetCountdownText(for: limit.resetsAt) {
+            VStack(alignment: .leading, spacing: 2) {
+                if let fraction = UsageDisplayFormatting.resetRemainingFraction(
+                    for: limit.resetsAt,
+                    window: resetWindow
+                ) {
+                    MeterBar(fraction: fraction, tint: .accentColor, height: 3)
+                }
+                Text(countdown)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    /// Length of the rolling reset window for this limit, inferred from its
+    /// kind. Used to turn a bare reset timestamp into a countdown fraction.
+    private var resetWindow: TimeInterval? {
+        switch limit.kind {
+        case "session": return 5 * 3600
+        case "weekly_all", "weekly_scoped": return 7 * 86_400
+        default: return nil
         }
     }
 
@@ -186,6 +209,28 @@ struct UsageMeterView: View {
             MeterSegment(id: 0, name: "Used", value: used, color: tint),
             MeterSegment(id: 1, name: "Remaining", value: max(0, 100 - used), color: Color.secondary.opacity(0.18))
         ]
+    }
+}
+
+/// A horizontal capsule progress bar drawn with explicit fills. Unlike
+/// `ProgressView`, its colors don't wash out to gray when a widget is rendered
+/// in its inactive (desaturated) state.
+private struct MeterBar: View {
+    var fraction: Double
+    var tint: Color
+    var height: CGFloat
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.secondary.opacity(0.22))
+                Capsule()
+                    .fill(tint)
+                    .frame(width: min(max(fraction, 0), 1) * geo.size.width)
+            }
+        }
+        .frame(height: height)
     }
 }
 

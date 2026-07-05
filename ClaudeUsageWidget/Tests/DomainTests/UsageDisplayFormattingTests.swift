@@ -87,6 +87,48 @@ final class UsageDisplayFormattingTests: XCTestCase {
         XCTAssertEqual(UsageDisplayFormatting.resetText(for: resetsAt, now: now), "resets soon")
     }
 
+    // MARK: - Reset countdown
+
+    func testResetCountdownTextDaysAndHours() {
+        let now = Date()
+        let resetsAt = now.addingTimeInterval(3 * 86_400 + 5 * 3600)
+        XCTAssertEqual(UsageDisplayFormatting.resetCountdownText(for: resetsAt, now: now), "resets in 3d 5h")
+    }
+
+    func testResetCountdownTextHoursAndMinutes() {
+        let now = Date()
+        let resetsAt = now.addingTimeInterval(4 * 3600 + 12 * 60)
+        XCTAssertEqual(UsageDisplayFormatting.resetCountdownText(for: resetsAt, now: now), "resets in 4h 12m")
+    }
+
+    func testResetCountdownTextInPast() {
+        let now = Date()
+        XCTAssertEqual(
+            UsageDisplayFormatting.resetCountdownText(for: now.addingTimeInterval(-60), now: now),
+            "resets soon"
+        )
+    }
+
+    func testResetCountdownTextNilWhenMissing() {
+        XCTAssertNil(UsageDisplayFormatting.resetCountdownText(for: nil))
+    }
+
+    func testResetRemainingFraction() {
+        let now = Date()
+        let window: TimeInterval = 7 * 86_400
+        // Half the window remaining -> 0.5.
+        let half = UsageDisplayFormatting.resetRemainingFraction(
+            for: now.addingTimeInterval(window / 2), window: window, now: now
+        )
+        XCTAssertEqual(half ?? -1, 0.5, accuracy: 0.0001)
+        // Clamps to 0 when reset is due, nil when window unknown.
+        XCTAssertEqual(
+            UsageDisplayFormatting.resetRemainingFraction(for: now.addingTimeInterval(-100), window: window, now: now),
+            0
+        )
+        XCTAssertNil(UsageDisplayFormatting.resetRemainingFraction(for: now, window: nil, now: now))
+    }
+
     // MARK: - Cache age
 
     func testCacheAgeText() {

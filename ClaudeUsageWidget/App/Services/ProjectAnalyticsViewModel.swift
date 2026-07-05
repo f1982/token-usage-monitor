@@ -46,6 +46,20 @@ final class ProjectAnalyticsViewModel: ObservableObject {
         settingsStore.settings.localProjectAnalyticsEnabled
     }
 
+    /// Background prefetch entry point. Scans only when analytics is enabled
+    /// and the cached summaries are older than the user's chosen refresh
+    /// interval (or missing). Fresh cache and `manual` mode short-circuit so
+    /// launching the app doesn't re-scan on every open.
+    func refreshIfStale() async {
+        guard isEnabled, !isScanning else { return }
+        guard let maxAge = settingsStore.settings.projectAnalyticsRefreshInterval.seconds else { return }
+
+        if let generatedAt, now().timeIntervalSince(generatedAt) < maxAge {
+            return
+        }
+        await refresh()
+    }
+
     func refresh() async {
         guard isEnabled, !isScanning else { return }
         isScanning = true

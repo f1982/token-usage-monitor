@@ -41,6 +41,39 @@ enum UsageDisplayFormatting {
         return "resets \(formatter.string(from: resetsAt))"
     }
 
+    /// Verbose countdown to reset, e.g. "resets in 3d 5h", "resets in 4h 12m".
+    /// Unlike ``resetText`` (used in the compact widget), this always spells out
+    /// the remaining days/hours so the app can pair it with a countdown bar.
+    static func resetCountdownText(for resetsAt: Date?, now: Date = Date()) -> String? {
+        guard let resetsAt else { return nil }
+        let interval = resetsAt.timeIntervalSince(now)
+        if interval <= 0 { return "resets soon" }
+        let days = Int(interval / 86_400)
+        let hours = Int(interval.truncatingRemainder(dividingBy: 86_400) / 3600)
+        let minutes = Int(interval.truncatingRemainder(dividingBy: 3600) / 60)
+        if days > 0 {
+            return hours > 0 ? "resets in \(days)d \(hours)h" : "resets in \(days)d"
+        }
+        if hours > 0 {
+            return minutes > 0 ? "resets in \(hours)h \(minutes)m" : "resets in \(hours)h"
+        }
+        if minutes > 0 { return "resets in \(minutes)m" }
+        return "resets in <1m"
+    }
+
+    /// Fraction (0...1) of the reset window still remaining, given the window
+    /// length. 1 = the window just started, 0 = reset is due. Returns nil when
+    /// the window length is unknown so callers can hide the bar.
+    static func resetRemainingFraction(
+        for resetsAt: Date?,
+        window: TimeInterval?,
+        now: Date = Date()
+    ) -> Double? {
+        guard let resetsAt, let window, window > 0 else { return nil }
+        let remaining = resetsAt.timeIntervalSince(now)
+        return min(max(remaining / window, 0), 1)
+    }
+
     /// Grouped integer text, e.g. "123,456".
     static func groupedNumberText(_ value: Int) -> String {
         let formatter = NumberFormatter()

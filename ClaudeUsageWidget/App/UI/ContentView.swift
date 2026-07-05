@@ -26,6 +26,7 @@ enum AppSection: String, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @EnvironmentObject private var refreshService: UsageRefreshService
+    @EnvironmentObject private var analytics: ProjectAnalyticsViewModel
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var selection: AppSection = .overview
@@ -60,6 +61,10 @@ struct ContentView: View {
         .frame(minWidth: 640, minHeight: 420)
         .task {
             await refreshService.refresh()
+        }
+        .task {
+            // Background prefetch so the Projects tab is warm on first open.
+            await analytics.refreshIfStale()
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }

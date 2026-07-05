@@ -77,6 +77,9 @@ struct ProjectsView: View {
         .task {
             if !analytics.hasScanned {
                 await analytics.refresh()
+            } else {
+                // Re-scan only if the cache is older than the chosen interval.
+                await analytics.refreshIfStale()
             }
         }
     }
@@ -112,9 +115,10 @@ struct ProjectSummaryRow: View {
                 Text(summary.projectName)
                     .font(.headline)
                 Spacer()
-                Text("\(UsageDisplayFormatting.groupedNumberText(summary.totalTokens)) tokens")
+                Text("\(UsageDisplayFormatting.compactTokenText(summary.totalTokens)) tokens")
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
+                    .help("\(UsageDisplayFormatting.groupedNumberText(summary.totalTokens)) tokens")
             }
             Text(detailLine)
                 .font(.caption)
@@ -138,9 +142,9 @@ struct ProjectSummaryRow: View {
 
     private var detailLine: String {
         var parts: [String] = []
-        parts.append("in \(UsageDisplayFormatting.groupedNumberText(summary.inputTokens))")
-        parts.append("out \(UsageDisplayFormatting.groupedNumberText(summary.outputTokens))")
-        parts.append("cache \(UsageDisplayFormatting.groupedNumberText(summary.cacheCreationTokens + summary.cacheReadTokens))")
+        parts.append("in \(UsageDisplayFormatting.compactTokenText(summary.inputTokens))")
+        parts.append("out \(UsageDisplayFormatting.compactTokenText(summary.outputTokens))")
+        parts.append("cache \(UsageDisplayFormatting.compactTokenText(summary.cacheCreationTokens + summary.cacheReadTokens))")
         parts.append("\(summary.messageCount) messages")
         if let lastUsedAt = summary.lastUsedAt {
             parts.append("last used \(UsageDisplayFormatting.cacheAgeText(fetchedAt: lastUsedAt))")

@@ -81,6 +81,17 @@ struct SettingsView: View {
                 .textFieldStyle(.roundedBorder)
                 .disableAutocorrection(true)
 
+            if settingsStore.settings.localProjectAnalyticsEnabled {
+                Picker("Auto-refresh", selection: $settingsStore.settings.projectAnalyticsRefreshInterval) {
+                    ForEach(ProjectAnalyticsRefreshInterval.allCases) { interval in
+                        Text(interval.displayName).tag(interval)
+                    }
+                }
+                Text("How often the Projects page re-scans local logs in the background. Data is scanned once on launch when older than this interval.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             HStack {
                 Button("Open Claude Projects Folder") {
                     openProjectsFolder()
