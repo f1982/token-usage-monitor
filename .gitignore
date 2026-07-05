@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# XcodeGen — the .xcodeproj is generated from project.yml (source of truth).
+# Run `xcodegen generate` after cloning.
+*.xcodeproj
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods / Carthage (unused today, kept for safety)
+Pods/
+Carthage/Build/
