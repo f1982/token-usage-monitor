@@ -21,6 +21,8 @@ struct UsageMeterView: View {
             donutBody
         case .waterBall:
             waterBallBody
+        case .neonSegments:
+            neonSegmentsBody
         }
     }
 
@@ -133,6 +135,17 @@ struct UsageMeterView: View {
         }
     }
 
+    private var neonSegmentsBody: some View {
+        VStack(alignment: .leading, spacing: compact ? 4 : 6) {
+            header
+            NeonSegmentGaugeView(
+                fraction: clampedPercent / 100,
+                compact: compact
+            )
+            resetView
+        }
+    }
+
     // MARK: - Shared pieces
 
     private var header: some View {
@@ -175,6 +188,8 @@ struct UsageMeterView: View {
         switch limit.kind {
         case "session": return 5 * 3600
         case "weekly_all", "weekly_scoped": return 7 * 86_400
+        case "codex_primary": return 5 * 3600
+        case "codex_secondary": return 7 * 86_400
         default: return nil
         }
     }
@@ -239,6 +254,90 @@ private struct MeterSegment: Identifiable {
     let name: String
     let value: Double
     let color: Color
+}
+
+/// A neon, slanted segment gauge inspired by arcade stat meters. It keeps the
+/// percentage readable while giving the chart style a clearly different shape.
+private struct NeonSegmentGaugeView: View {
+    var fraction: Double
+    var compact: Bool
+
+    private var clampedFraction: Double { min(max(fraction, 0), 1) }
+    private var segmentCount: Int { compact ? 14 : 22 }
+    private var activeCount: Int { Int((clampedFraction * Double(segmentCount)).rounded()) }
+    private var greenTailCount: Int { max(1, min(activeCount, compact ? 2 : 4)) }
+
+    var body: some View {
+        GeometryReader { geo in
+            let height = max(geo.size.height, compact ? 12 : 18)
+            let slant = min(height * 0.46, compact ? 6 : 8)
+            let leadWidth = min(max(geo.size.width * 0.28, compact ? 26 : 56), compact ? 44 : 92)
+            let gap: CGFloat = compact ? 2 : 3
+            let segmentWidth = max(
+                compact ? 5 : 8,
+                (geo.size.width - leadWidth - gap * CGFloat(segmentCount - 1)) / CGFloat(segmentCount)
+            )
+
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [.yellow, .orange, .pink],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: leadWidth + slant, height: compact ? 3 : 4)
+                    .offset(y: height * 0.22)
+
+                HStack(spacing: gap) {
+                    ForEach(0..<segmentCount, id: \.self) { index in
+                        let isActive = index < activeCount
+                        let isGreenTail = isActive && index >= max(0, activeCount - greenTailCount)
+                        SlantedSegment(slant: slant)
+                            .fill(segmentColor(isActive: isActive, isGreenTail: isGreenTail))
+                            .overlay {
+                                SlantedSegment(slant: slant)
+                                    .stroke(Color.black.opacity(isActive ? 0.28 : 0.45), lineWidth: 1)
+                            }
+                            .shadow(
+                                color: isActive ? segmentGlowColor(isGreenTail: isGreenTail) : .clear,
+                                radius: compact ? 2 : 4
+                            )
+                            .frame(width: segmentWidth, height: height)
+                    }
+                }
+                .offset(x: leadWidth)
+            }
+        }
+        .frame(height: compact ? 14 : 22)
+        .accessibilityLabel("Usage")
+        .accessibilityValue("\(Int((clampedFraction * 100).rounded())) percent")
+    }
+
+    private func segmentColor(isActive: Bool, isGreenTail: Bool) -> Color {
+        guard isActive else { return Color.secondary.opacity(0.16) }
+        return isGreenTail ? Color.green.opacity(0.9) : Color.pink.opacity(0.95)
+    }
+
+    private func segmentGlowColor(isGreenTail: Bool) -> Color {
+        isGreenTail ? Color.green.opacity(0.6) : Color.pink.opacity(0.5)
+    }
+}
+
+private struct SlantedSegment: Shape {
+    var slant: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let dx = min(slant, rect.width * 0.6)
+        var path = Path()
+        path.move(to: CGPoint(x: dx, y: 0))
+        path.addLine(to: CGPoint(x: rect.maxX, y: 0))
+        path.addLine(to: CGPoint(x: rect.maxX - dx, y: rect.maxY))
+        path.addLine(to: CGPoint(x: 0, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
 }
 
 /// A sine-wave water surface at `progress` height (0 = empty, 1 = full),

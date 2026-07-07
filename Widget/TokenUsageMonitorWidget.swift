@@ -8,8 +8,8 @@ struct TokenUsageMonitorWidget: Widget {
         StaticConfiguration(kind: kind, provider: ClaudeUsageTimelineProvider()) { entry in
             TokenUsageMonitorWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Claude Code Usage")
-        .description("Shows your Claude Code session and weekly usage.")
+        .configurationDisplayName("Code Usage")
+        .description("Shows your Claude Code and Codex usage.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

@@ -22,7 +22,9 @@ final class UsageSettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.settings.quotaSourceMode, .officialStatuslineOnly)
         XCTAssertFalse(store.settings.localProjectAnalyticsEnabled, "local analytics must default to off")
         XCTAssertFalse(store.settings.experimentalOAuthEnabled, "experimental OAuth must default to off")
+        XCTAssertEqual(store.settings.visibleUsageSources, Set(UsageDisplaySource.allCases))
         XCTAssertEqual(store.settings.claudeProjectsPath, "~/.claude/projects")
+        XCTAssertEqual(store.settings.codexSessionsPath, "~/.codex/sessions")
         XCTAssertEqual(store.settings.projectAnalyticsDefaultRange, .last7Days)
         XCTAssertEqual(store.settings.usageChartStyle, .progressBar, "chart style must default to the linear progress bar")
     }
@@ -32,16 +34,20 @@ final class UsageSettingsStoreTests: XCTestCase {
         store.settings.quotaSourceMode = .statuslineThenLocalThenOAuth
         store.settings.localProjectAnalyticsEnabled = true
         store.settings.claudeProjectsPath = "~/custom/projects"
+        store.settings.codexSessionsPath = "~/custom/codex/sessions"
         store.settings.experimentalOAuthEnabled = true
         store.settings.usageChartStyle = .donut
+        store.settings.visibleUsageSources = [.codex]
 
         let reloaded = UsageSettingsStore(defaults: defaults)
 
         XCTAssertEqual(reloaded.settings.quotaSourceMode, .statuslineThenLocalThenOAuth)
         XCTAssertTrue(reloaded.settings.localProjectAnalyticsEnabled)
         XCTAssertEqual(reloaded.settings.claudeProjectsPath, "~/custom/projects")
+        XCTAssertEqual(reloaded.settings.codexSessionsPath, "~/custom/codex/sessions")
         XCTAssertTrue(reloaded.settings.experimentalOAuthEnabled)
         XCTAssertEqual(reloaded.settings.usageChartStyle, .donut)
+        XCTAssertEqual(reloaded.settings.visibleUsageSources, [.codex])
     }
 
     func testMissingChartStyleFallsBackToProgressBar() {
@@ -52,6 +58,17 @@ final class UsageSettingsStoreTests: XCTestCase {
         let store = UsageSettingsStore(defaults: defaults)
 
         XCTAssertEqual(store.settings.usageChartStyle, .progressBar)
+        XCTAssertEqual(store.settings.visibleUsageSources, Set(UsageDisplaySource.allCases))
+        XCTAssertEqual(store.settings.codexSessionsPath, "~/.codex/sessions")
+    }
+
+    func testEmptyVisibleSourcesFallsBackToAllSources() {
+        let json = #"{"visibleUsageSources":[]}"#
+        defaults.set(Data(json.utf8), forKey: UsageSettingsStore.storageKey)
+
+        let store = UsageSettingsStore(defaults: defaults)
+
+        XCTAssertEqual(store.settings.visibleUsageSources, Set(UsageDisplaySource.allCases))
     }
 
     func testCorruptStoredSettingsFallBackToDefaults() {

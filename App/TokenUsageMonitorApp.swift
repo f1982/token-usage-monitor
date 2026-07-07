@@ -22,6 +22,14 @@ struct TokenUsageMonitorApp: App {
         _settingsStore = StateObject(wrappedValue: settingsStore)
         _refreshService = StateObject(wrappedValue: UsageRefreshService(
             aggregator: aggregator,
+            codexUsageProvider: CodexSessionUsageProvider(
+                sessionsDirectory: {
+                    URL(
+                        fileURLWithPath: (settingsStore.settings.codexSessionsPath as NSString).expandingTildeInPath,
+                        isDirectory: true
+                    )
+                }
+            ),
             cacheStore: UsageCacheStore(),
             reloadWidgets: reloadWidgets
         ))

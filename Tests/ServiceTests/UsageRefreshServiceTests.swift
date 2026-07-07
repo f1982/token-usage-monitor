@@ -27,6 +27,16 @@ private final class MockCacheStore: UsageCacheStoring, @unchecked Sendable {
     }
 }
 
+private final class MockCodexUsageProvider: CodexUsageProviding, @unchecked Sendable {
+    var limits: [UsageLimit] = []
+    private(set) var callCount = 0
+
+    func fetchCodexLimits() async -> [UsageLimit] {
+        callCount += 1
+        return limits
+    }
+}
+
 private final class MutableClock: @unchecked Sendable {
     var current = Date(timeIntervalSince1970: 1_751_700_000)
     func advance(by interval: TimeInterval) { current = current.addingTimeInterval(interval) }
@@ -56,10 +66,12 @@ final class UsageRefreshServiceTests: XCTestCase {
         aggregator: MockAggregator,
         cache: MockCacheStore,
         clock: MutableClock,
+        codexUsageProvider: CodexUsageProviding? = nil,
         reloadWidgets: @escaping () -> Void = {}
     ) -> UsageRefreshService {
         UsageRefreshService(
             aggregator: aggregator,
+            codexUsageProvider: codexUsageProvider,
             cacheStore: cache,
             reloadWidgets: reloadWidgets,
             now: { clock.current }
@@ -94,6 +106,32 @@ final class UsageRefreshServiceTests: XCTestCase {
         XCTAssertEqual(result, fresh)
         XCTAssertEqual(cache.stored, fresh)
         XCTAssertEqual(cache.writeCount, 1)
+    }
+
+    func testSuccessfulRefreshMergesCodexLimits() async {
+        let aggregator = MockAggregator()
+        let cache = MockCacheStore()
+        let clock = MutableClock()
+        let codexProvider = MockCodexUsageProvider()
+        codexProvider.limits = [
+            UsageLimit(
+                id: "codex-primary",
+                kind: "codex_primary",
+                label: "Codex 5h",
+                percent: 34,
+                resetsAt: Date(timeIntervalSince1970: 1_783_341_600)
+            ),
+        ]
+        aggregator.results = [
+            QuotaAggregationResult(snapshot: makeSnapshot(fetchedAt: clock.current), providerID: .statusline, failureNote: nil),
+        ]
+
+        let service = makeService(aggregator: aggregator, cache: cache, clock: clock, codexUsageProvider: codexProvider)
+        let result = await service.refresh()
+
+        XCTAssertEqual(codexProvider.callCount, 1)
+        XCTAssertEqual(result.codex, codexProvider.limits)
+        XCTAssertEqual(cache.stored?.codex, codexProvider.limits)
     }
 
     func testForcedRefreshBypassesFreshCache() async {

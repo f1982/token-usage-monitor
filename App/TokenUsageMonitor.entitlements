@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>4MX24QZ69S.group.me.andycao.app.tokenusagemonitor</string>
+		<string>group.example.tokenusagemonitor</string>
 	</array>
 </dict>
 </plist>

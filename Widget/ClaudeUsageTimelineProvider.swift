@@ -1,5 +1,4 @@
 import Foundation
-import os
 import WidgetKit
 
 /// Reads the cached quota snapshot and (when Local Project Analytics is
@@ -29,25 +28,9 @@ struct ClaudeUsageTimelineProvider: TimelineProvider {
     }
 
     private func makeEntry() -> TokenUsageMonitorWidgetEntry {
-        // TEMP diagnostics: trace why the snapshot cache read fails in the appex.
-        let log = Logger(subsystem: "me.andycao.app.tokenusagemonitor", category: "widget")
-        if let url = AppGroup.snapshotFileURL {
-            log.error("snapshot url: \(url.path, privacy: .public)")
-            log.error("file exists: \(FileManager.default.fileExists(atPath: url.path), privacy: .public)")
-            do {
-                let data = try Data(contentsOf: url)
-                log.error("read ok: \(data.count, privacy: .public) bytes")
-            } catch {
-                log.error("read failed: \(String(describing: error), privacy: .public)")
-            }
-        } else {
-            log.error("snapshot url: NIL (containerURL failed)")
-        }
-
-        var entry = TokenUsageMonitorWidgetEntry(date: Date(), snapshot: cacheStore.read())
-        log.error("entry snapshot nil: \(entry.snapshot == nil, privacy: .public)")
-
         let settings = UsageSettingsStore.readShared()
+        let visibleSnapshot = cacheStore.read()?.filtered(visibleSources: settings.visibleUsageSources)
+        var entry = TokenUsageMonitorWidgetEntry(date: Date(), snapshot: visibleSnapshot)
         entry.chartStyle = settings.usageChartStyle
         if settings.localProjectAnalyticsEnabled, let cache = projectCacheStore.read() {
             entry.topProjects = Array(cache.summaries.prefix(Self.topProjectCount))

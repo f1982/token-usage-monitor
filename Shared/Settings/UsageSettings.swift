@@ -30,6 +30,7 @@ enum UsageChartStyle: String, Codable, CaseIterable, Identifiable {
     case bar
     case donut
     case waterBall
+    case neonSegments
 
     var id: String { rawValue }
 
@@ -39,6 +40,7 @@ enum UsageChartStyle: String, Codable, CaseIterable, Identifiable {
         case .bar: return "Bar Chart"
         case .donut: return "Donut"
         case .waterBall: return "Water Ball"
+        case .neonSegments: return "Neon Segments"
         }
     }
 
@@ -49,12 +51,29 @@ enum UsageChartStyle: String, Codable, CaseIterable, Identifiable {
         case .bar: return "chart.bar.fill"
         case .donut: return "chart.pie.fill"
         case .waterBall: return "drop.fill"
+        case .neonSegments: return "rectangle.grid.1x2.fill"
         }
     }
 
     /// The water ball shows quota *remaining* (a draining tank); the others
     /// fill up as quota is *used*.
     var showsRemaining: Bool { self == .waterBall }
+}
+
+/// Which usage products are visible in the overview and widget. Keep this
+/// enum additive so future products can join the same settings UI.
+enum UsageDisplaySource: String, Codable, CaseIterable, Identifiable {
+    case claudeCode
+    case codex
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .claudeCode: return "Claude Code"
+        case .codex: return "Codex"
+        }
+    }
 }
 
 /// How often the Projects page auto-refreshes its cached per-project
@@ -95,8 +114,10 @@ enum ProjectAnalyticsRefreshInterval: String, Codable, CaseIterable, Identifiabl
 
 struct UsageSettings: Codable, Equatable {
     var quotaSourceMode: QuotaSourceMode
+    var visibleUsageSources: Set<UsageDisplaySource>
     var localProjectAnalyticsEnabled: Bool
     var claudeProjectsPath: String
+    var codexSessionsPath: String
     var experimentalOAuthEnabled: Bool
     var projectAnalyticsDefaultRange: ProjectUsageTimeRange
     var projectAnalyticsRefreshInterval: ProjectAnalyticsRefreshInterval
@@ -104,8 +125,10 @@ struct UsageSettings: Codable, Equatable {
 
     static let `default` = UsageSettings(
         quotaSourceMode: .officialStatuslineOnly,
+        visibleUsageSources: Set(UsageDisplaySource.allCases),
         localProjectAnalyticsEnabled: false,
         claudeProjectsPath: "~/.claude/projects",
+        codexSessionsPath: "~/.codex/sessions",
         experimentalOAuthEnabled: false,
         projectAnalyticsDefaultRange: .last7Days,
         projectAnalyticsRefreshInterval: .hourly,
@@ -114,16 +137,20 @@ struct UsageSettings: Codable, Equatable {
 
     init(
         quotaSourceMode: QuotaSourceMode,
+        visibleUsageSources: Set<UsageDisplaySource> = Set(UsageDisplaySource.allCases),
         localProjectAnalyticsEnabled: Bool,
         claudeProjectsPath: String,
+        codexSessionsPath: String = "~/.codex/sessions",
         experimentalOAuthEnabled: Bool,
         projectAnalyticsDefaultRange: ProjectUsageTimeRange,
         projectAnalyticsRefreshInterval: ProjectAnalyticsRefreshInterval = .hourly,
         usageChartStyle: UsageChartStyle
     ) {
         self.quotaSourceMode = quotaSourceMode
+        self.visibleUsageSources = visibleUsageSources.isEmpty ? Set(UsageDisplaySource.allCases) : visibleUsageSources
         self.localProjectAnalyticsEnabled = localProjectAnalyticsEnabled
         self.claudeProjectsPath = claudeProjectsPath
+        self.codexSessionsPath = codexSessionsPath
         self.experimentalOAuthEnabled = experimentalOAuthEnabled
         self.projectAnalyticsDefaultRange = projectAnalyticsDefaultRange
         self.projectAnalyticsRefreshInterval = projectAnalyticsRefreshInterval
@@ -137,10 +164,15 @@ struct UsageSettings: Codable, Equatable {
         let defaults = UsageSettings.default
         quotaSourceMode = (try? container.decodeIfPresent(QuotaSourceMode.self, forKey: .quotaSourceMode))
             .flatMap { $0 } ?? defaults.quotaSourceMode
+        let decodedSources = (try? container.decodeIfPresent(Set<UsageDisplaySource>.self, forKey: .visibleUsageSources))
+            .flatMap { $0 } ?? defaults.visibleUsageSources
+        visibleUsageSources = decodedSources.isEmpty ? defaults.visibleUsageSources : decodedSources
         localProjectAnalyticsEnabled = (try? container.decodeIfPresent(Bool.self, forKey: .localProjectAnalyticsEnabled))
             .flatMap { $0 } ?? defaults.localProjectAnalyticsEnabled
         claudeProjectsPath = (try? container.decodeIfPresent(String.self, forKey: .claudeProjectsPath))
             .flatMap { $0 } ?? defaults.claudeProjectsPath
+        codexSessionsPath = (try? container.decodeIfPresent(String.self, forKey: .codexSessionsPath))
+            .flatMap { $0 } ?? defaults.codexSessionsPath
         experimentalOAuthEnabled = (try? container.decodeIfPresent(Bool.self, forKey: .experimentalOAuthEnabled))
             .flatMap { $0 } ?? defaults.experimentalOAuthEnabled
         projectAnalyticsDefaultRange = (try? container.decodeIfPresent(ProjectUsageTimeRange.self, forKey: .projectAnalyticsDefaultRange))

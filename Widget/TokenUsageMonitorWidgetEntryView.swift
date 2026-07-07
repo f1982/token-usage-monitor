@@ -28,7 +28,7 @@ struct TokenUsageMonitorWidgetEntryView: View {
             Image(systemName: "arrow.clockwise.circle")
                 .font(.title2)
                 .foregroundStyle(.secondary)
-            Text("Open app to load Claude usage")
+            Text("Open app to load usage")
                 .font(.caption)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
@@ -53,7 +53,7 @@ struct TokenUsageMonitorWidgetEntryView: View {
 
     private func usageView(_ snapshot: ClaudeUsageSnapshot) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Claude Code")
+            Text("Code Usage")
                 .font(.caption)
                 .bold()
 
@@ -74,6 +74,9 @@ struct TokenUsageMonitorWidgetEntryView: View {
                         limitRow(limit)
                     }
                 }
+                ForEach(snapshot.codex.prefix(family == .systemMedium ? 2 : 1)) { limit in
+                    limitRow(limit)
+                }
             }
 
             Spacer(minLength: 0)
@@ -90,6 +93,9 @@ struct TokenUsageMonitorWidgetEntryView: View {
         }
         if let session = snapshot.session {
             parts.append("Session \(UsageDisplayFormatting.shortPercentText(session.percent))")
+        }
+        if let codex = snapshot.codex.first {
+            parts.append("Codex \(UsageDisplayFormatting.shortPercentText(codex.percent))")
         }
         return Text(parts.joined(separator: " · "))
             .font(.caption2)
@@ -133,7 +139,7 @@ struct TokenUsageMonitorWidgetEntryView: View {
             Spacer()
             if family == .systemMedium,
                let resetText = UsageDisplayFormatting.resetText(
-                   for: snapshot.weekly?.resetsAt ?? snapshot.session?.resetsAt,
+                   for: snapshot.weekly?.resetsAt ?? snapshot.session?.resetsAt ?? snapshot.codex.first?.resetsAt,
                    now: entry.date
                ) {
                 Text(resetText)

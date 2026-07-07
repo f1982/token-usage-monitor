@@ -9,7 +9,9 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            displaySection
             quotaSourceSection
+            codexSection
             appearanceSection
             projectAnalyticsSection
             experimentalSection
@@ -21,6 +23,12 @@ struct SettingsView: View {
             Task { await refreshService.refresh(force: true) }
         }
         .onChange(of: settingsStore.settings.experimentalOAuthEnabled) { _, _ in
+            Task { await refreshService.refresh(force: true) }
+        }
+        .onChange(of: settingsStore.settings.visibleUsageSources) { _, _ in
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        .onChange(of: settingsStore.settings.codexSessionsPath) { _, _ in
             Task { await refreshService.refresh(force: true) }
         }
         .onChange(of: settingsStore.settings.localProjectAnalyticsEnabled) { _, _ in
@@ -35,8 +43,18 @@ struct SettingsView: View {
 
     // MARK: - Sections
 
+    private var displaySection: some View {
+        Section("Display") {
+            Toggle("Show Claude Code", isOn: sourceBinding(.claudeCode))
+            Toggle("Show Codex", isOn: sourceBinding(.codex))
+            Text("Choose which usage products appear in the overview and widget. At least one source stays enabled.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     private var quotaSourceSection: some View {
-        Section("Usage Source") {
+        Section("Claude Code Source") {
             Picker("Quota Source Mode", selection: $settingsStore.settings.quotaSourceMode) {
                 ForEach(QuotaSourceMode.allCases) { mode in
                     Text(mode.displayName).tag(mode)
@@ -45,6 +63,28 @@ struct SettingsView: View {
             Text("The official Claude Code statusline is always tried first. Fallback sources are only used when you enable them here.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    private var codexSection: some View {
+        Section("Codex") {
+            TextField("Codex Sessions Path", text: $settingsStore.settings.codexSessionsPath)
+                .textFieldStyle(.roundedBorder)
+                .disableAutocorrection(true)
+
+            Text("Reads local Codex session JSONL files and uses the newest token_count rate limit event. Prompt and message content are not stored.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HStack {
+                Button("Open Codex Sessions Folder") {
+                    openCodexSessionsFolder()
+                }
+                Button("Refresh Codex Usage") {
+                    Task { await refreshService.refresh(force: true) }
+                }
+                .disabled(refreshService.isRefreshing)
+            }
         }
     }
 
@@ -130,5 +170,27 @@ struct SettingsView: View {
     private func openProjectsFolder() {
         let path = (settingsStore.settings.claudeProjectsPath as NSString).expandingTildeInPath
         NSWorkspace.shared.open(URL(fileURLWithPath: path, isDirectory: true))
+    }
+
+    private func openCodexSessionsFolder() {
+        let path = (settingsStore.settings.codexSessionsPath as NSString).expandingTildeInPath
+        NSWorkspace.shared.open(URL(fileURLWithPath: path, isDirectory: true))
+    }
+
+    private func sourceBinding(_ source: UsageDisplaySource) -> Binding<Bool> {
+        Binding(
+            get: {
+                settingsStore.settings.visibleUsageSources.contains(source)
+            },
+            set: { isVisible in
+                var sources = settingsStore.settings.visibleUsageSources
+                if isVisible {
+                    sources.insert(source)
+                } else if sources.count > 1 {
+                    sources.remove(source)
+                }
+                settingsStore.settings.visibleUsageSources = sources
+            }
+        )
     }
 }

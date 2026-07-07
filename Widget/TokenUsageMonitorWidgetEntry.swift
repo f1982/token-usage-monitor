@@ -16,6 +16,9 @@ struct TokenUsageMonitorWidgetEntry: TimelineEntry {
                 session: UsageLimit(id: "session", kind: "session", label: "Session", percent: 42, resetsAt: nil),
                 weekly: UsageLimit(id: "weekly", kind: "weekly_all", label: "All models", percent: 31, resetsAt: nil),
                 weeklyScoped: [],
+                codex: [
+                    UsageLimit(id: "codex-primary", kind: "codex_primary", label: "Codex 5h", percent: 24, resetsAt: nil),
+                ],
                 note: nil,
                 fetchedAt: date
             )

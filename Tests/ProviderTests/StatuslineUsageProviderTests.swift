@@ -67,14 +67,15 @@ final class StatuslineUsageProviderTests: XCTestCase {
         XCTAssertEqual(result.error, .missing)
     }
 
-    func testStaleFileReturnsStaleError() async throws {
+    func testStaleFileReturnsStaleSnapshotWithStaleError() async throws {
         try writeStateFile(capturedAt: now.addingTimeInterval(-11 * 60), rateLimits: """
         {"weekly": {"kind": "weekly_all", "label": "All models", "percent": 42}}
         """)
 
         let result = await makeProvider().fetchQuotaUsage()
 
-        XCTAssertNil(result.value)
+        XCTAssertEqual(result.value?.weekly?.percent, 42)
+        XCTAssertEqual(result.value?.note, "Official statusline data is stale.")
         XCTAssertEqual(result.error, .staleData)
     }
 

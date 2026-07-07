@@ -62,13 +62,19 @@ struct StatuslineUsageProvider: UsageProvider {
         guard let capturedAt = ISO8601Parsing.date(from: state.capturedAt) else {
             return .failure(.parseFailure, provenance: provenance, fetchedAt: currentTime)
         }
-        guard currentTime.timeIntervalSince(capturedAt) <= Self.freshnessWindow else {
-            return .failure(.staleData, provenance: provenance, fetchedAt: currentTime)
-        }
-
         let snapshot = Self.makeSnapshot(from: state, capturedAt: capturedAt)
         guard snapshot.hasAnyUsage else {
             return .failure(.unavailable, provenance: provenance, fetchedAt: currentTime)
+        }
+        if currentTime.timeIntervalSince(capturedAt) > Self.freshnessWindow {
+            var staleSnapshot = snapshot
+            staleSnapshot.note = "Official statusline data is stale."
+            return UsageProviderResult(
+                value: staleSnapshot,
+                error: .staleData,
+                provenance: provenance,
+                fetchedAt: currentTime
+            )
         }
         return .success(snapshot, provenance: provenance, fetchedAt: currentTime)
     }

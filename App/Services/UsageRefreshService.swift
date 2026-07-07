@@ -13,6 +13,7 @@ final class UsageRefreshService: ObservableObject {
     @Published private(set) var isRefreshing = false
 
     private let aggregator: QuotaAggregating
+    private let codexUsageProvider: CodexUsageProviding?
     private let cacheStore: UsageCacheStoring
     private let reloadWidgets: () -> Void
     private let now: () -> Date
@@ -21,11 +22,13 @@ final class UsageRefreshService: ObservableObject {
 
     init(
         aggregator: QuotaAggregating,
+        codexUsageProvider: CodexUsageProviding? = nil,
         cacheStore: UsageCacheStoring,
         reloadWidgets: @escaping () -> Void = {},
         now: @escaping () -> Date = Date.init
     ) {
         self.aggregator = aggregator
+        self.codexUsageProvider = codexUsageProvider
         self.cacheStore = cacheStore
         self.reloadWidgets = reloadWidgets
         self.now = now
@@ -54,25 +57,32 @@ final class UsageRefreshService: ObservableObject {
         let currentTime = now()
 
         if !force, let cached, currentTime.timeIntervalSince(cached.fetchedAt) < Self.cacheTTL {
-            snapshot = cached
-            return cached
+            let updated = await addingCodexLimits(to: cached)
+            if updated != cached {
+                cacheStore.write(updated)
+                reloadWidgets()
+            }
+            snapshot = updated
+            return updated
         }
 
         let outcome = await aggregator.fetchQuota()
 
         if let fresh = outcome.snapshot {
-            cacheStore.write(fresh)
-            snapshot = fresh
+            let updated = await addingCodexLimits(to: fresh)
+            cacheStore.write(updated)
+            snapshot = updated
             reloadWidgets()
-            return fresh
+            return updated
         }
 
-        return publish(stale(cached, note: outcome.failureNote ?? "Usage data not available."))
+        return await publish(stale(cached, note: outcome.failureNote ?? "Usage data not available."))
     }
 
-    private func publish(_ result: ClaudeUsageSnapshot) -> ClaudeUsageSnapshot {
-        snapshot = result
-        return result
+    private func publish(_ result: ClaudeUsageSnapshot) async -> ClaudeUsageSnapshot {
+        let updated = await addingCodexLimits(to: result)
+        snapshot = updated
+        return updated
     }
 
     /// Serves the stale cache with a note when available; otherwise an
@@ -83,5 +93,16 @@ final class UsageRefreshService: ObservableObject {
             return cached
         }
         return .unavailable(note: note, fetchedAt: now())
+    }
+
+    private func addingCodexLimits(to snapshot: ClaudeUsageSnapshot) async -> ClaudeUsageSnapshot {
+        guard let codexUsageProvider else { return snapshot }
+        let codexLimits = await codexUsageProvider.fetchCodexLimits()
+        guard !codexLimits.isEmpty else { return snapshot }
+
+        var updated = snapshot
+        updated.available = updated.available || !codexLimits.isEmpty
+        updated.codex = codexLimits
+        return updated
     }
 }

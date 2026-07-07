@@ -1,6 +1,6 @@
 name: TokenUsageMonitor
 options:
-  bundleIdPrefix: me.andycao.app
+  bundleIdPrefix: com.example
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
@@ -8,7 +8,7 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    DEVELOPMENT_TEAM: 4MX24QZ69S
+    DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
     ENABLE_HARDENED_RUNTIME: NO
 
@@ -21,7 +21,7 @@ targets:
       - Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: me.andycao.app.tokenusagemonitor
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.tokenusagemonitor
         PRODUCT_NAME: TokenUsageMonitor
     info:
       path: App/Info.plist
@@ -32,7 +32,7 @@ targets:
       path: App/TokenUsageMonitor.entitlements
       properties:
         com.apple.security.application-groups:
-          - 4MX24QZ69S.group.me.andycao.app.tokenusagemonitor
+          - group.example.tokenusagemonitor
     dependencies:
       - target: TokenUsageMonitorExtension
 
@@ -44,7 +44,7 @@ targets:
       - Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: me.andycao.app.tokenusagemonitor.widget
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.tokenusagemonitor.widget
         PRODUCT_NAME: TokenUsageMonitorExtension
         SKIP_INSTALL: YES
     info:
@@ -57,7 +57,7 @@ targets:
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.application-groups:
-          - 4MX24QZ69S.group.me.andycao.app.tokenusagemonitor
+          - group.example.tokenusagemonitor
 
   TokenUsageMonitorTests:
     type: bundle.unit-test
@@ -69,7 +69,7 @@ targets:
       - App/Providers
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: me.andycao.app.tokenusagemonitor.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.tokenusagemonitor.tests
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_IDENTITY: "-"
 
