@@ -104,20 +104,39 @@ struct UsageOverviewView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                if let fetchedAt = refreshService.snapshot?.fetchedAt {
-                    Text("Updated \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                dataHealthLabel
                 Spacer()
                 if refreshService.isRefreshing {
                     ProgressView()
                         .controlSize(.small)
                 }
-                Button("Refresh") {
+                Button(refreshService.isRefreshing ? "Refreshing…" : "Refresh") {
                     Task { await refreshService.refresh(force: true) }
                 }
                 .disabled(refreshService.isRefreshing)
+                .help("Fetch the latest available usage data")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var dataHealthLabel: some View {
+        if refreshService.isRefreshing {
+            Label("Refreshing", systemImage: "arrow.triangle.2.circlepath")
+                .foregroundStyle(.secondary)
+                .font(.caption)
+        } else if let fetchedAt = refreshService.snapshot?.fetchedAt {
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                let age = context.date.timeIntervalSince(fetchedAt)
+                let isStale = age >= UsageRefreshService.cacheTTL
+                Label(
+                    isStale ? "Stale · \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt, now: context.date))" :
+                        "Updated \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt, now: context.date))",
+                    systemImage: isStale ? "exclamationmark.triangle" : "checkmark.circle"
+                )
+                .foregroundStyle(isStale ? .orange : .secondary)
+                .font(.caption)
+                .help("Last source update: \(fetchedAt.formatted(date: .abbreviated, time: .shortened))")
             }
         }
     }
