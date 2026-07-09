@@ -10,7 +10,7 @@ settings:
     SWIFT_VERSION: "5.9"
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
-    ENABLE_HARDENED_RUNTIME: NO
+    ENABLE_HARDENED_RUNTIME: YES
     APP_BUNDLE_ID: com.example.tokenusagemonitor
     WIDGET_BUNDLE_ID: com.example.tokenusagemonitor.widget
     APP_GROUP_IDENTIFIER: group.example.tokenusagemonitor
