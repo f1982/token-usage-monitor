@@ -4,12 +4,17 @@ import SwiftUI
 struct UsageOverviewView: View {
     @EnvironmentObject private var refreshService: UsageRefreshService
     @EnvironmentObject private var settingsStore: UsageSettingsStore
+    @EnvironmentObject private var codexSessionMonitor: CodexSessionMonitor
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Code Usage")
                 .font(.title2)
                 .bold()
+
+            if settingsStore.settings.visibleUsageSources.contains(.codex) {
+                codexSessionCard
+            }
 
             if let snapshot = refreshService.snapshot {
                 usageSections(for: snapshot, visibleSources: settingsStore.settings.visibleUsageSources)
@@ -57,6 +62,66 @@ struct UsageOverviewView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var codexSessionCard: some View {
+        if let session = codexSessionMonitor.session {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Label(session.isActive ? "Live session" : "Idle session", systemImage: session.isActive ? "circle.fill" : "pause.circle")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(session.isActive ? .green : .secondary)
+                    Spacer()
+                    Text(UsageDisplayFormatting.cacheAgeText(fetchedAt: session.lastEventAt))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                if let model = session.model { metadataRow("Model", model) }
+                if let provider = session.provider { metadataRow("Provider", provider) }
+                if let client = session.client { metadataRow("Client", client) }
+                if let workingDirectory = session.workingDirectory {
+                    metadataRow("Project", URL(fileURLWithPath: workingDirectory).lastPathComponent)
+                    metadataRow("Folder", workingDirectory)
+                }
+                if let totalTokens = session.totalTokens {
+                    metadataRow("Tokens", UsageDisplayFormatting.groupedNumberText(totalTokens))
+                }
+                if let contextWindow = session.contextWindow {
+                    metadataRow("Context", UsageDisplayFormatting.groupedNumberText(contextWindow))
+                }
+            }
+            .padding(10)
+            .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 8))
+        } else {
+            HStack(spacing: 8) {
+                Image(systemName: "hourglass")
+                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Codex session not detected")
+                        .font(.subheadline.weight(.medium))
+                    Text("Checking ~/.codex/sessions every 10 seconds")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 8))
+        }
+    }
+
+    private func metadataRow(_ label: String, _ value: String) -> some View {
+        HStack(alignment: .top) {
+            Text(label)
+                .foregroundStyle(.secondary)
+                .frame(width: 70, alignment: .leading)
+            Text(value)
+                .textSelection(.enabled)
+                .lineLimit(1)
+                .truncationMode(.middle)
+        }
+        .font(.caption)
     }
 
     @ViewBuilder

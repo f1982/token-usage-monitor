@@ -1,7 +1,8 @@
 import Foundation
 
 enum AppGroup {
-    static let identifier = "group.example.tokenusagemonitor"
+    static let identifier = Bundle.main.object(forInfoDictionaryKey: "APP_GROUP_IDENTIFIER") as? String
+        ?? "group.example.tokenusagemonitor"
 
     static var containerURL: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier)

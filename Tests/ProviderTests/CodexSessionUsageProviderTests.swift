@@ -26,4 +26,22 @@ final class CodexSessionUsageProviderTests: XCTestCase {
 
         XCTAssertTrue(CodexSessionUsageProvider.limits(fromJSONL: jsonl).isEmpty)
     }
+
+    func testParsesActiveSessionMetadataAndUsage() {
+        let jsonl = """
+        {"timestamp":"2026-07-10T00:00:00Z","type":"session_meta","payload":{"session_id":"session-1","cwd":"/tmp/token-usage-monitor","originator":"Codex Desktop","model_provider":"openai"}}
+        {"timestamp":"2026-07-10T00:00:10Z","type":"turn_context","payload":{"model":"gpt-5.6-luna"}}
+        {"timestamp":"2026-07-10T00:00:12Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"total_tokens":1234},"model_context_window":353400}}}
+        """
+
+        let session = CodexSessionUsageProvider.activeSession(fromJSONL: jsonl)
+
+        XCTAssertEqual(session?.sessionID, "session-1")
+        XCTAssertEqual(session?.provider, "openai")
+        XCTAssertEqual(session?.model, "gpt-5.6-luna")
+        XCTAssertEqual(session?.client, "Codex Desktop")
+        XCTAssertEqual(session?.workingDirectory, "/tmp/token-usage-monitor")
+        XCTAssertEqual(session?.totalTokens, 1234)
+        XCTAssertEqual(session?.contextWindow, 353400)
+    }
 }

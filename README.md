@@ -110,28 +110,115 @@ The `.xcodeproj` is generated from `project.yml`.
 
 ```sh
 brew install xcodegen   # once
-xcodegen generate       # after editing project.yml or adding files
-
-# build + test from the CLI
-xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
-  -allowProvisioningUpdates build
-xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
-  -destination 'platform=macOS' -allowProvisioningUpdates test
+# regenerate the ignored .xcodeproj from project.yml
+xcodegen generate
 ```
 
-Or just open `TokenUsageMonitor.xcodeproj` in Xcode and run.
+### Local unsigned build
 
-This repository ships with placeholder signing identifiers:
+The open-source repository does not contain a developer Team, certificate, or
+provisioning profile. Build locally without code signing:
+
+```sh
+xcodegen generate
+
+xcodebuild \
+  -project TokenUsageMonitor.xcodeproj \
+  -scheme TokenUsageMonitor \
+  -destination 'platform=macOS' \
+  build \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+Run the generated app with:
+
+```sh
+open ~/Library/Developer/Xcode/DerivedData/TokenUsageMonitor-*/Build/Products/Debug/TokenUsageMonitor.app
+```
+
+Run all unit tests with signing disabled:
+
+```sh
+xcodebuild \
+  -project TokenUsageMonitor.xcodeproj \
+  -scheme TokenUsageMonitor \
+  -destination 'platform=macOS' \
+  test \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+Run only the Codex parser tests:
+
+```sh
+xcodebuild \
+  -project TokenUsageMonitor.xcodeproj \
+  -scheme TokenUsageMonitor \
+  -destination 'platform=macOS' \
+  test \
+  CODE_SIGNING_ALLOWED=NO \
+  -only-testing:TokenUsageMonitorTests/CodexSessionUsageProviderTests
+```
+
+The generated `.xcodeproj` is ignored by Git. If Xcode reports Team or
+provisioning errors, use the unsigned CLI build above, or configure signing
+locally in Xcode without committing those settings.
+
+### Signed GitHub Releases
+
+For downloads hosted on GitHub, the recommended distribution path is a
+Developer ID signed and Apple-notarized macOS app. Apple describes [Developer
+ID distribution](https://developer.apple.com/support/developer-id/) and
+[notarization](https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases)
+for apps distributed outside the Mac App Store;
+Gatekeeper uses the Developer ID signature to identify the developer and the
+notarization ticket to increase user confidence.
+
+Keep repository configuration and signing secrets separate:
+
+| Value | GitHub storage | Secret? |
+| --- | --- | --- |
+| Team ID | Actions variable | No |
+| App bundle IDs | Actions variable | No |
+| App Group ID | Actions variable | No |
+| Developer ID certificate | Actions secret | Yes |
+| Certificate password | Actions secret | Yes |
+| App Store Connect API key or notarization credentials | Actions secrets | Yes |
+| Provisioning profile, if required by the selected capabilities | Actions secret | Yes |
+
+The release workflow should create a temporary keychain, import the signing
+certificate and profile from GitHub Secrets, generate the Xcode project with
+the release identifiers, archive the app, sign/notarize it, package it as a
+zip, and upload that zip to a GitHub Release. Private keys, certificates,
+profiles, and API keys must never be committed to the repository or placed in
+`.env` files that can be uploaded accidentally.
+
+The current workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml).
+It uses Developer ID signing and notarization and does not currently require
+the two provisioning-profile variables. Configure a GitHub Environment named
+`release`, add the variables and secrets listed above, then publish a release
+by pushing a version tag:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The workflow can also be started manually with **Actions → Release macOS app →
+Run workflow** and a version such as `1.0.0`.
+
+The current repository contains only placeholder identifiers:
 
 - `DEVELOPMENT_TEAM: ""`
 - bundle IDs under `com.example.tokenusagemonitor`
 - App Group `group.example.tokenusagemonitor`
 
-Before building the widget target, replace those placeholders with identifiers
-from your Apple Developer account in `project.yml`, both `.entitlements` files
-(`App/` and `Widget/`), and `Shared/Constants/AppGroup.swift`, then re-run
-`xcodegen generate`. App Groups require a real team-scoped identifier such as
-`<TEAM_ID>.group.<your.bundle.id>`.
+Before enabling a signed release workflow, replace these values at build time
+or through an untracked local/CI configuration layer. App and widget targets
+must use matching, team-scoped App Group identifiers. The exact need for a
+provisioning profile depends on the distribution channel and entitlements;
+Apple documents that some macOS entitlements can be claimed without a profile,
+while restricted capabilities and App Groups must match the authorized
+signing configuration.
 
 ## Using the widget
 

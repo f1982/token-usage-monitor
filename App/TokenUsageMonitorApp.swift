@@ -6,6 +6,7 @@ struct TokenUsageMonitorApp: App {
     @StateObject private var settingsStore: UsageSettingsStore
     @StateObject private var refreshService: UsageRefreshService
     @StateObject private var projectAnalytics: ProjectAnalyticsViewModel
+    @StateObject private var codexSessionMonitor: CodexSessionMonitor
 
     init() {
         let settingsStore = UsageSettingsStore()
@@ -33,10 +34,20 @@ struct TokenUsageMonitorApp: App {
             cacheStore: UsageCacheStore(),
             reloadWidgets: reloadWidgets
         ))
+        let codexProvider = CodexSessionUsageProvider(
+            sessionsDirectory: {
+                URL(
+                    fileURLWithPath: (settingsStore.settings.codexSessionsPath as NSString).expandingTildeInPath,
+                    isDirectory: true
+                )
+            }
+        )
+
         _projectAnalytics = StateObject(wrappedValue: ProjectAnalyticsViewModel(
             settingsStore: settingsStore,
             reloadWidgets: reloadWidgets
         ))
+        _codexSessionMonitor = StateObject(wrappedValue: CodexSessionMonitor(provider: codexProvider))
     }
 
     var body: some Scene {
@@ -45,6 +56,7 @@ struct TokenUsageMonitorApp: App {
                 .environmentObject(settingsStore)
                 .environmentObject(refreshService)
                 .environmentObject(projectAnalytics)
+                .environmentObject(codexSessionMonitor)
         }
         .windowResizability(.contentSize)
     }

@@ -4,9 +4,13 @@ protocol CodexUsageProviding {
     func fetchCodexLimits() async -> [UsageLimit]
 }
 
+protocol CodexActiveSessionProviding {
+    func fetchActiveSession() async -> CodexActiveSession?
+}
+
 /// Reads Codex rate limits from the latest local session JSONL. Codex emits
 /// `token_count` events with `rate_limits.primary` and `rate_limits.secondary`.
-struct CodexSessionUsageProvider: CodexUsageProviding {
+struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProviding {
     static var defaultSessionsDirectory: URL {
         FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent(".codex/sessions")
@@ -35,6 +39,10 @@ struct CodexSessionUsageProvider: CodexUsageProviding {
         await scanner.fetchLimits(in: sessionsDirectory())
     }
 
+    func fetchActiveSession() async -> CodexActiveSession? {
+        await scanner.fetchActiveSession(in: sessionsDirectory())
+    }
+
     static func limits(fromJSONL contents: String) -> [UsageLimit] {
         let decoder = JSONDecoder()
         for line in contents.split(separator: "\n", omittingEmptySubsequences: true).reversed() {
@@ -48,6 +56,58 @@ struct CodexSessionUsageProvider: CodexUsageProviding {
             return makeLimits(from: rateLimits)
         }
         return []
+    }
+
+    static func activeSession(fromJSONL contents: String) -> CodexActiveSession? {
+        var sessionID: String?
+        var provider: String?
+        var model: String?
+        var client: String?
+        var workingDirectory: String?
+        var lastEventAt: Date?
+        var totalTokens: Int?
+        var contextWindow: Int?
+
+        for line in contents.split(separator: "\n", omittingEmptySubsequences: true) {
+            guard let data = String(line).data(using: .utf8),
+                  let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let payload = object["payload"] as? [String: Any] else { continue }
+
+            if let value = payload["session_id"] as? String { sessionID = value }
+            if let value = payload["model_provider"] as? String { provider = value }
+            if let value = payload["model"] as? String { model = value }
+            if let value = payload["cwd"] as? String { workingDirectory = value }
+            if let value = payload["originator"] as? String { client = value }
+            if let value = object["timestamp"] as? String,
+               let date = ISO8601Parsing.date(from: value) {
+                lastEventAt = date
+            }
+
+            if let info = payload["info"] as? [String: Any] {
+                if let usage = info["total_token_usage"] as? [String: Any],
+                   let value = usage["total_tokens"] as? NSNumber {
+                    totalTokens = value.intValue
+                }
+                if let value = info["model_context_window"] as? NSNumber {
+                    contextWindow = value.intValue
+                }
+            }
+            if let value = payload["model_context_window"] as? NSNumber {
+                contextWindow = value.intValue
+            }
+        }
+
+        guard let lastEventAt else { return nil }
+        return CodexActiveSession(
+            sessionID: sessionID,
+            provider: provider,
+            model: model,
+            client: client,
+            workingDirectory: workingDirectory,
+            lastEventAt: lastEventAt,
+            totalTokens: totalTokens,
+            contextWindow: contextWindow
+        )
     }
 
     private static func makeLimits(from rateLimits: CodexRateLimits) -> [UsageLimit] {
@@ -122,6 +182,16 @@ private actor CodexSessionScanner {
         }
 
         return CodexSessionUsageProvider.limits(fromJSONL: contents)
+    }
+
+    func fetchActiveSession(in directory: URL) -> CodexActiveSession? {
+        guard let fileURL = latestSessionFile(in: directory),
+              let data = try? Data(contentsOf: fileURL),
+              let contents = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+
+        return CodexSessionUsageProvider.activeSession(fromJSONL: contents)
     }
 
     private func latestSessionFile(in directory: URL) -> URL? {
