@@ -134,6 +134,38 @@ final class UsageRefreshServiceTests: XCTestCase {
         XCTAssertEqual(cache.stored?.codex, codexProvider.limits)
     }
 
+    func testSuccessfulClaudeRefreshPreservesCachedCodexWhenCodexReadFails() async {
+        let aggregator = MockAggregator()
+        let cache = MockCacheStore()
+        let clock = MutableClock()
+        let codexUsageProvider = MockCodexUsageProvider()
+        let previousCodex = [
+            UsageLimit(id: "codex-primary", kind: "codex_primary", label: "Codex 5h", percent: 22, resetsAt: nil),
+        ]
+        var cached = makeSnapshot(fetchedAt: clock.current.addingTimeInterval(-10 * 60))
+        cached.codex = previousCodex
+        cached.available = true
+        cache.stored = cached
+        aggregator.results = [
+            QuotaAggregationResult(
+                snapshot: makeSnapshot(fetchedAt: clock.current, percent: 50),
+                providerID: .statusline,
+                failureNote: nil
+            ),
+        ]
+
+        let service = makeService(
+            aggregator: aggregator,
+            cache: cache,
+            clock: clock,
+            codexUsageProvider: codexUsageProvider
+        )
+        let result = await service.refresh()
+
+        XCTAssertEqual(result.codex, previousCodex)
+        XCTAssertTrue(result.available)
+    }
+
     func testForcedRefreshBypassesFreshCache() async {
         let aggregator = MockAggregator()
         let cache = MockCacheStore()

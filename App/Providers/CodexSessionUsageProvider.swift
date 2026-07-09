@@ -13,14 +13,14 @@ struct CodexSessionUsageProvider: CodexUsageProviding {
     }
 
     var sessionsDirectory: () -> URL
-    var fileManager: FileManager
+    private let scanner: CodexSessionScanner
 
     init(
         sessionsDirectory: URL = Self.defaultSessionsDirectory,
         fileManager: FileManager = .default
     ) {
         self.sessionsDirectory = { sessionsDirectory }
-        self.fileManager = fileManager
+        self.scanner = CodexSessionScanner(fileManager: fileManager)
     }
 
     init(
@@ -28,39 +28,11 @@ struct CodexSessionUsageProvider: CodexUsageProviding {
         fileManager: FileManager = .default
     ) {
         self.sessionsDirectory = sessionsDirectory
-        self.fileManager = fileManager
+        self.scanner = CodexSessionScanner(fileManager: fileManager)
     }
 
     func fetchCodexLimits() async -> [UsageLimit] {
-        guard let fileURL = latestSessionFile() else { return [] }
-        guard let data = try? Data(contentsOf: fileURL),
-              let contents = String(data: data, encoding: .utf8) else {
-            return []
-        }
-
-        return Self.limits(fromJSONL: contents)
-    }
-
-    private func latestSessionFile() -> URL? {
-        guard let enumerator = fileManager.enumerator(
-            at: sessionsDirectory(),
-            includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        ) else {
-            return nil
-        }
-
-        return enumerator
-            .compactMap { $0 as? URL }
-            .filter { $0.pathExtension == "jsonl" }
-            .filter { url in
-                (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
-            }
-            .max { lhs, rhs in
-                let lhsDate = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
-                let rhsDate = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
-                return lhsDate < rhsDate
-            }
+        await scanner.fetchLimits(in: sessionsDirectory())
     }
 
     static func limits(fromJSONL contents: String) -> [UsageLimit] {
@@ -130,6 +102,48 @@ struct CodexSessionUsageProvider: CodexUsageProviding {
         default:
             return fallback
         }
+    }
+}
+
+/// Performs filesystem work on its own actor so quota refreshes do not block
+/// SwiftUI's main actor while traversing and reading session logs.
+private actor CodexSessionScanner {
+    let fileManager: FileManager
+
+    init(fileManager: FileManager) {
+        self.fileManager = fileManager
+    }
+
+    func fetchLimits(in directory: URL) -> [UsageLimit] {
+        guard let fileURL = latestSessionFile(in: directory),
+              let data = try? Data(contentsOf: fileURL),
+              let contents = String(data: data, encoding: .utf8) else {
+            return []
+        }
+
+        return CodexSessionUsageProvider.limits(fromJSONL: contents)
+    }
+
+    private func latestSessionFile(in directory: URL) -> URL? {
+        guard let enumerator = fileManager.enumerator(
+            at: directory,
+            includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return nil
+        }
+
+        return enumerator
+            .compactMap { $0 as? URL }
+            .filter { $0.pathExtension == "jsonl" }
+            .filter { url in
+                (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
+            }
+            .max { lhs, rhs in
+                let lhsDate = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                let rhsDate = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                return lhsDate < rhsDate
+            }
     }
 }
 

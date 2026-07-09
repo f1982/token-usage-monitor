@@ -69,7 +69,7 @@ final class UsageRefreshService: ObservableObject {
         let outcome = await aggregator.fetchQuota()
 
         if let fresh = outcome.snapshot {
-            let updated = await addingCodexLimits(to: fresh)
+            let updated = await addingCodexLimits(to: fresh, fallbackCodex: cached?.codex ?? [])
             cacheStore.write(updated)
             snapshot = updated
             reloadWidgets()
@@ -95,14 +95,20 @@ final class UsageRefreshService: ObservableObject {
         return .unavailable(note: note, fetchedAt: now())
     }
 
-    private func addingCodexLimits(to snapshot: ClaudeUsageSnapshot) async -> ClaudeUsageSnapshot {
+    private func addingCodexLimits(
+        to snapshot: ClaudeUsageSnapshot,
+        fallbackCodex: [UsageLimit] = []
+    ) async -> ClaudeUsageSnapshot {
         guard let codexUsageProvider else { return snapshot }
         let codexLimits = await codexUsageProvider.fetchCodexLimits()
-        guard !codexLimits.isEmpty else { return snapshot }
 
         var updated = snapshot
-        updated.available = updated.available || !codexLimits.isEmpty
-        updated.codex = codexLimits
+        if codexLimits.isEmpty {
+            updated.codex = snapshot.codex.isEmpty ? fallbackCodex : snapshot.codex
+        } else {
+            updated.codex = codexLimits
+        }
+        updated.available = updated.hasAnyUsage
         return updated
     }
 }
