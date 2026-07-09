@@ -26,6 +26,8 @@ jobs:
       APP_GROUP_IDENTIFIER: ${{ vars.APP_GROUP_IDENTIFIER }}
       CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD }}
       CERTIFICATE_P12_BASE64: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_BASE64 }}
+      APP_PROVISIONING_PROFILE_BASE64: ${{ secrets.APP_PROVISIONING_PROFILE_BASE64 }}
+      WIDGET_PROVISIONING_PROFILE_BASE64: ${{ secrets.WIDGET_PROVISIONING_PROFILE_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
       APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
       APPLE_API_PRIVATE_KEY_P8: ${{ secrets.APPLE_API_PRIVATE_KEY_P8 }}
@@ -68,6 +70,7 @@ jobs:
           required=(
             APPLE_TEAM_ID APP_BUNDLE_ID WIDGET_BUNDLE_ID APP_GROUP_IDENTIFIER
             CERTIFICATE_PASSWORD CERTIFICATE_P12_BASE64
+            APP_PROVISIONING_PROFILE_BASE64 WIDGET_PROVISIONING_PROFILE_BASE64
             APPLE_API_KEY_ID APPLE_API_ISSUER_ID APPLE_API_PRIVATE_KEY_P8
           )
           for name in "${required[@]}"; do
@@ -96,6 +99,34 @@ jobs:
             | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -1)"
           [[ -n "$identity" ]] || { echo "Developer ID Application identity not found" >&2; exit 1; }
           echo "identity=$identity" >> "$GITHUB_OUTPUT"
+
+      - name: Install provisioning profiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          profiles_dir="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$profiles_dir"
+
+          install_profile() {
+            local base64_value="$1"
+            local label="$2"
+            local profile="$RUNNER_TEMP/${label}.provisionprofile"
+            printf '%s' "$base64_value" | base64 --decode > "$profile"
+
+            local uuid
+            local name
+            uuid="$(security cms -D -i "$profile" | plutil -extract UUID raw -o - -)"
+            name="$(security cms -D -i "$profile" | plutil -extract Name raw -o - -)"
+            [[ -n "$uuid" && -n "$name" ]] || {
+              echo "Could not read $label provisioning profile metadata" >&2
+              exit 1
+            }
+            cp "$profile" "$profiles_dir/$uuid.provisionprofile"
+            printf '%s=%s\n' "${label}_PROVISIONING_PROFILE_SPECIFIER" "$name" >> "$GITHUB_ENV"
+          }
+
+          install_profile "$APP_PROVISIONING_PROFILE_BASE64" APP
+          install_profile "$WIDGET_PROVISIONING_PROFILE_BASE64" WIDGET
 
       - name: Generate Xcode project
         run: xcodegen generate
@@ -129,6 +160,8 @@ jobs:
             CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            APP_PROVISIONING_PROFILE_SPECIFIER="$APP_PROVISIONING_PROFILE_SPECIFIER" \
+            WIDGET_PROVISIONING_PROFILE_SPECIFIER="$WIDGET_PROVISIONING_PROFILE_SPECIFIER" \
             CODE_SIGNING_REQUIRED=YES \
             CODE_SIGNING_ALLOWED=YES
 

@@ -26,6 +26,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
         PRODUCT_NAME: TokenUsageMonitor
+        PROVISIONING_PROFILE_SPECIFIER: $(APP_PROVISIONING_PROFILE_SPECIFIER)
     info:
       path: App/Info.plist
       properties:
@@ -50,6 +51,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)
         PRODUCT_NAME: TokenUsageMonitorExtension
         SKIP_INSTALL: YES
+        PROVISIONING_PROFILE_SPECIFIER: $(WIDGET_PROVISIONING_PROFILE_SPECIFIER)
     info:
       path: Widget/Info.plist
       properties:
