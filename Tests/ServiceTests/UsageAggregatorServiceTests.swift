@@ -154,6 +154,29 @@ final class UsageAggregatorServiceTests: XCTestCase {
         XCTAssertEqual(result.providerID, .localEstimate)
     }
 
+    func testStaleSnapshotWithErrorDoesNotShortCircuitFallback() async {
+        let stale = snapshot(provenance: .official)
+        let statusline = StubProvider(id: .statusline, provenance: .official, results: [
+            UsageProviderResult(
+                value: stale,
+                error: .staleData,
+                provenance: .official,
+                fetchedAt: baseDate
+            ),
+        ])
+        let local = success(.localEstimate, .localEstimate)
+        let service = makeService(
+            settings: settings(mode: .statuslineThenLocalEstimate),
+            providers: [statusline, local],
+            now: { self.baseDate }
+        )
+
+        let result = await service.fetchQuota()
+
+        XCTAssertEqual(result.providerID, .localEstimate)
+        XCTAssertEqual(result.snapshot?.provenance, .localEstimate)
+    }
+
     func testOAuthUsedOnlyWhenExplicitlyEnabled() async {
         let statusline = failing(.statusline, .official, error: .missing)
         let oauth = success(.oauthExperimental, .experimental)

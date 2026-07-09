@@ -49,7 +49,11 @@ final class UsageAggregatorService: QuotaAggregating {
             }
 
             let result = await provider.fetchQuotaUsage()
-            if let snapshot = result.value {
+            // A provider may include a stale snapshot as diagnostic context,
+            // but only an error-free value is eligible for selection. Stale
+            // data must flow through the fallback chain instead of being
+            // written back as a fresh cache entry.
+            if let snapshot = result.value, result.error == nil {
                 return QuotaAggregationResult(snapshot: snapshot, providerID: providerID, failureNote: nil)
             }
 
