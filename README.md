@@ -60,34 +60,15 @@ Claude Code statusline command that writes the normalized state file, e.g. in
 }
 ```
 
-with a script that maps the statusline JSON (stdin) to the normalized format:
+Install the included converter and make it executable:
 
 ```sh
-#!/bin/bash
-# ~/.claude/statusline-usage.sh
-# Claude Code (>= 2.1.80, Pro/Max subscription) provides
-# `.rate_limits.five_hour` / `.rate_limits.seven_day` with `used_percentage`
-# and `resets_at` (Unix epoch seconds). Both windows can be absent until the
-# first API response of a session.
-input=$(cat)
-mkdir -p ~/.claude-usage-widget/statusline
-echo "$input" | jq '
-  def iso: if . == null then null elif type == "number" then todate else tostring end;
-  {
-    schemaVersion: 1,
-    source: "claude-code-statusline",
-    capturedAt: (now | todate),
-    rateLimits: {
-      session: {kind: "session", label: "Session",
-                percent: (.rate_limits.five_hour.used_percentage // null),
-                resetsAt: (.rate_limits.five_hour.resets_at | iso)},
-      weekly:  {kind: "weekly_all", label: "All models",
-                percent: (.rate_limits.seven_day.used_percentage // null),
-                resetsAt: (.rate_limits.seven_day.resets_at | iso)}
-    }
-  }' > ~/.claude-usage-widget/statusline/latest.json 2>/dev/null
-echo "Claude Code"   # whatever you want the statusline to display
+cp scripts/statusline-usage.sh ~/.claude/statusline-usage.sh
+chmod +x ~/.claude/statusline-usage.sh
 ```
+
+The converter writes to a temporary file and atomically replaces
+`latest.json`, so the app cannot observe a half-written JSON document.
 
 If the file is missing or older than 10 minutes, the app reports
 "Official statusline data not available." and only falls back to sources you
