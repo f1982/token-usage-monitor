@@ -23,3 +23,6 @@ build/
 # CocoaPods / Carthage (unused today, kept for safety)
 Pods/
 Carthage/Build/
+
+.env.*
+.env
