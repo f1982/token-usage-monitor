@@ -10,11 +10,13 @@ final class UsageRefreshService: ObservableObject {
     static let cacheTTL: TimeInterval = 5 * 60
 
     @Published private(set) var snapshot: ClaudeUsageSnapshot?
+    @Published private(set) var history: [UsageHistoryPoint]
     @Published private(set) var isRefreshing = false
 
     private let aggregator: QuotaAggregating
     private let codexUsageProvider: CodexUsageProviding?
     private let cacheStore: UsageCacheStoring
+    private let historyStore: UsageHistoryStore
     private let reloadWidgets: () -> Void
     private let now: () -> Date
 
@@ -24,15 +26,18 @@ final class UsageRefreshService: ObservableObject {
         aggregator: QuotaAggregating,
         codexUsageProvider: CodexUsageProviding? = nil,
         cacheStore: UsageCacheStoring,
+        historyStore: UsageHistoryStore = UsageHistoryStore(),
         reloadWidgets: @escaping () -> Void = {},
         now: @escaping () -> Date = Date.init
     ) {
         self.aggregator = aggregator
         self.codexUsageProvider = codexUsageProvider
         self.cacheStore = cacheStore
+        self.historyStore = historyStore
         self.reloadWidgets = reloadWidgets
         self.now = now
         self.snapshot = cacheStore.read()
+        self.history = historyStore.read()
     }
 
     /// Refreshes usage. Fresh cache short-circuits unless `force` is true
@@ -71,6 +76,8 @@ final class UsageRefreshService: ObservableObject {
         if let fresh = outcome.snapshot {
             let updated = await addingCodexLimits(to: fresh, fallbackCodex: cached?.codex ?? [])
             cacheStore.write(updated)
+            historyStore.append(snapshot: updated)
+            history = historyStore.read()
             snapshot = updated
             reloadWidgets()
             return updated

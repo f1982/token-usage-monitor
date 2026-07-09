@@ -15,6 +15,10 @@ enum AppGroup {
         containerURL?.appendingPathComponent("project-usage-summary.json")
     }
 
+    static var usageHistoryFileURL: URL? {
+        containerURL?.appendingPathComponent("usage-history.json")
+    }
+
     static var userDefaults: UserDefaults? {
         UserDefaults(suiteName: identifier)
     }

@@ -1,3 +1,4 @@
+import Charts
 import SwiftUI
 
 struct UsageOverviewView: View {
@@ -12,6 +13,7 @@ struct UsageOverviewView: View {
 
             if let snapshot = refreshService.snapshot {
                 usageSections(for: snapshot, visibleSources: settingsStore.settings.visibleUsageSources)
+                historySection
             } else {
                 Text("Loading usage…")
                     .foregroundStyle(.secondary)
@@ -84,6 +86,43 @@ struct UsageOverviewView: View {
     private func sourceHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
+    }
+
+    @ViewBuilder
+    private var historySection: some View {
+        let points = Array(refreshService.history.suffix(48))
+        if points.count >= 2 {
+            Divider()
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Recent trend")
+                    .font(.headline)
+                Chart(points) { point in
+                    if let weekly = point.weeklyPercent {
+                        LineMark(
+                            x: .value("Time", point.timestamp),
+                            y: .value("Used", weekly)
+                        )
+                        .foregroundStyle(by: .value("Limit", "Weekly"))
+                    }
+                    if let session = point.sessionPercent {
+                        LineMark(
+                            x: .value("Time", point.timestamp),
+                            y: .value("Used", session)
+                        )
+                        .foregroundStyle(by: .value("Limit", "Session"))
+                    }
+                }
+                .chartYScale(domain: 0...100)
+                .chartYAxis {
+                    AxisMarks(values: [0, 50, 100])
+                }
+                .chartLegend(position: .bottom, alignment: .leading)
+                .frame(height: 140)
+                Text("Stored locally for the last 30 days")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 
     private func unavailableText(_ text: String) -> some View {
