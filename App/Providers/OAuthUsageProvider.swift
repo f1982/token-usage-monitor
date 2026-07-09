@@ -17,7 +17,7 @@ struct OAuthUsageProvider: UsageProvider {
         usageClient: UsageFetching = ClaudeUsageClient(),
         now: @escaping () -> Date = Date.init
     ) {
-        self.tokenReader = tokenReader
+        self.tokenReader = MemoizingTokenReader(reader: tokenReader)
         self.usageClient = usageClient
         self.now = now
     }
@@ -31,6 +31,10 @@ struct OAuthUsageProvider: UsageProvider {
             snapshot.provenance = .experimental
             return .success(snapshot, provenance: provenance, fetchedAt: snapshot.fetchedAt)
         } catch let error as UsageClientError {
+            if error == .unauthorized,
+               let memoizingReader = tokenReader as? MemoizingTokenReader {
+                memoizingReader.invalidate()
+            }
             return .failure(Self.mapError(error), provenance: provenance, fetchedAt: now())
         } catch {
             return .failure(.network(error.localizedDescription), provenance: provenance, fetchedAt: now())

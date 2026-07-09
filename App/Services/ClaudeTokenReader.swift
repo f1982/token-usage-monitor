@@ -9,6 +9,47 @@ protocol KeychainReading {
     func readGenericPassword(service: String) -> Data?
 }
 
+/// Caches the result of credential discovery for the lifetime of the app.
+/// This avoids repeatedly triggering interactive Keychain authorization during
+/// automatic refreshes. A failed or invalidated lookup stays unavailable
+/// until the app creates a new reader (normally on the next launch).
+final class MemoizingTokenReader: TokenReading {
+    private let reader: TokenReading
+    private let lock = NSLock()
+    private var hasRead = false
+    private var cachedToken: String?
+    private var invalidated = false
+
+    init(reader: TokenReading) {
+        self.reader = reader
+    }
+
+    func readToken() -> String? {
+        lock.lock()
+        if hasRead || invalidated {
+            let token = cachedToken
+            lock.unlock()
+            return token
+        }
+        hasRead = true
+        lock.unlock()
+
+        let token = reader.readToken()
+
+        lock.lock()
+        cachedToken = token
+        lock.unlock()
+        return token
+    }
+
+    func invalidate() {
+        lock.lock()
+        cachedToken = nil
+        invalidated = true
+        lock.unlock()
+    }
+}
+
 struct SystemKeychainReader: KeychainReading {
     func readGenericPassword(service: String) -> Data? {
         let query: [String: Any] = [

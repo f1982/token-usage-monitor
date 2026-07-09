@@ -75,3 +75,48 @@ final class ClaudeTokenReaderTests: XCTestCase {
         XCTAssertNil(reader.readToken())
     }
 }
+
+private final class CountingTokenReader: TokenReading {
+    private(set) var callCount = 0
+    let token: String?
+
+    init(token: String?) {
+        self.token = token
+    }
+
+    func readToken() -> String? {
+        callCount += 1
+        return token
+    }
+}
+
+final class MemoizingTokenReaderTests: XCTestCase {
+    func testReadsUnderlyingReaderOnlyOnceForSuccessfulToken() {
+        let underlying = CountingTokenReader(token: "token")
+        let reader = MemoizingTokenReader(reader: underlying)
+
+        XCTAssertEqual(reader.readToken(), "token")
+        XCTAssertEqual(reader.readToken(), "token")
+        XCTAssertEqual(underlying.callCount, 1)
+    }
+
+    func testCachesMissingTokenToAvoidRepeatedKeychainPrompts() {
+        let underlying = CountingTokenReader(token: nil)
+        let reader = MemoizingTokenReader(reader: underlying)
+
+        XCTAssertNil(reader.readToken())
+        XCTAssertNil(reader.readToken())
+        XCTAssertEqual(underlying.callCount, 1)
+    }
+
+    func testInvalidationPreventsFurtherCredentialReads() {
+        let underlying = CountingTokenReader(token: "token")
+        let reader = MemoizingTokenReader(reader: underlying)
+
+        XCTAssertEqual(reader.readToken(), "token")
+        reader.invalidate()
+
+        XCTAssertNil(reader.readToken())
+        XCTAssertEqual(underlying.callCount, 1)
+    }
+}
