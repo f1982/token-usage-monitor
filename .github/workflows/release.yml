@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-14
+    runs-on: macos-26
     timeout-minutes: 30
     environment: release
     env:
@@ -39,6 +39,11 @@ jobs:
           if ! command -v xcodegen >/dev/null 2>&1; then
             HOMEBREW_NO_REQUIRE_TAP_TRUST=1 brew install xcodegen
           fi
+
+      - name: Select latest Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+          xcodebuild -version
 
       - name: Resolve release version
         id: version
