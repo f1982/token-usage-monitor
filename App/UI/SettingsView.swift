@@ -55,6 +55,7 @@ struct SettingsView: View {
 
     private var quotaSourceSection: some View {
         Section("Claude Code Source") {
+            statuslineConnectionRow
             Picker("Quota Source Mode", selection: $settingsStore.settings.quotaSourceMode) {
                 ForEach(QuotaSourceMode.allCases) { mode in
                     Text(mode.displayName).tag(mode)
@@ -64,6 +65,36 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private var statuslineConnectionRow: some View {
+        let exists = FileManager.default.fileExists(atPath: StatuslineUsageProvider.defaultFileURL.path)
+        return VStack(alignment: .leading, spacing: 6) {
+            Label(
+                exists ? "Statusline detected" : "Statusline not detected",
+                systemImage: exists ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+            )
+            .foregroundStyle(exists ? .green : .orange)
+
+            Text(
+                exists
+                    ? "Claude Code is writing local usage data. The app will use it automatically when the file is fresh."
+                    : "Install the statusline helper and run Claude Code once to start receiving official usage data."
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            HStack {
+                Button("Open Statusline Folder") {
+                    openStatuslineFolder()
+                }
+                Button("Refresh Status") {
+                    Task { await refreshService.refresh(force: true) }
+                }
+                .disabled(refreshService.isRefreshing)
+            }
+        }
+        .padding(.vertical, 2)
     }
 
     private var codexSection: some View {
@@ -170,6 +201,11 @@ struct SettingsView: View {
     private func openProjectsFolder() {
         let path = (settingsStore.settings.claudeProjectsPath as NSString).expandingTildeInPath
         NSWorkspace.shared.open(URL(fileURLWithPath: path, isDirectory: true))
+    }
+
+    private func openStatuslineFolder() {
+        let folderURL = StatuslineUsageProvider.defaultFileURL.deletingLastPathComponent()
+        NSWorkspace.shared.open(folderURL)
     }
 
     private func openCodexSessionsFolder() {
