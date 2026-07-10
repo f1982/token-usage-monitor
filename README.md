@@ -5,6 +5,12 @@ A native macOS app + desktop widget that shows your local **Claude Code** and
 limits, Codex reset state, and opt-in per-project token analytics. It's a
 SwiftUI + WidgetKit project, and everything runs and stays on your machine.
 
+Token Usage Monitor is an independent community project. It is not affiliated
+with, sponsored by, or endorsed by Anthropic, Claude Code, OpenAI, or Codex.
+Those names identify the local files and services whose usage data the user
+asks the app to display. The OAuth usage endpoint is undocumented; use it only
+with an account and token you are authorized to use.
+
 ## What it does
 
 - **Overview** — current session %, weekly "All models" %, and any scoped

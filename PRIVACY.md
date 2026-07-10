@@ -5,6 +5,9 @@ Last updated: 2026-07-10
 Token Usage Monitor is a macOS app that displays usage information from files
 you explicitly choose and, if enabled, an Anthropic usage endpoint.
 
+The app is independent and is not affiliated with or endorsed by Anthropic,
+OpenAI, Claude Code, or Codex. Product names are used descriptively.
+
 ## Data processed
 
 - Claude Code statusline files, Codex session files, and Claude project logs
