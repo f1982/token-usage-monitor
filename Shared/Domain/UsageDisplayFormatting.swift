@@ -83,6 +83,7 @@ enum UsageDisplayFormatting {
 
     /// Compact token count for the widget, e.g. "812", "284k", "1.2M".
     static func compactTokenText(_ tokens: Int) -> String {
+        let tokens = max(0, tokens)
         if tokens >= 1_000_000 {
             let millions = Double(tokens) / 1_000_000
             let text = String(format: "%.1f", millions)

@@ -138,4 +138,8 @@ final class UsageDisplayFormattingTests: XCTestCase {
         XCTAssertEqual(UsageDisplayFormatting.cacheAgeText(fetchedAt: now.addingTimeInterval(-3 * 3600), now: now), "3h ago")
         XCTAssertEqual(UsageDisplayFormatting.cacheAgeText(fetchedAt: now.addingTimeInterval(-2 * 86_400), now: now), "2d ago")
     }
+
+    func testCompactTokenTextClampsNegativeCounts() {
+        XCTAssertEqual(UsageDisplayFormatting.compactTokenText(-12), "0")
+    }
 }
