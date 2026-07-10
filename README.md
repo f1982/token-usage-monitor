@@ -165,52 +165,38 @@ locally in Xcode without committing those settings.
 
 ### Signed GitHub Releases
 
-For downloads hosted on GitHub, the recommended distribution path is a
-Developer ID signed and Apple-notarized macOS app. Apple describes [Developer
-ID distribution](https://developer.apple.com/support/developer-id/) and
-[notarization](https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases)
-for apps distributed outside the Mac App Store;
-Gatekeeper uses the Developer ID signature to identify the developer and the
-notarization ticket to increase user confidence.
-
-Keep repository configuration and signing secrets separate:
-
-| Value | GitHub storage | Secret? |
-| --- | --- | --- |
-| Team ID | Actions variable | No |
-| App bundle IDs | Actions variable | No |
-| App Group ID | Actions variable | No |
-| Developer ID certificate | Actions secret | Yes |
-| Certificate password | Actions secret | Yes |
-| App Store Connect API key or notarization credentials | Actions secrets | Yes |
-| Provisioning profile, if required by the selected capabilities | Actions secret | Yes |
-
-The release workflow should create a temporary keychain, import the signing
-certificate and profile from GitHub Secrets, generate the Xcode project with
-the release identifiers, archive the app, sign/notarize it, package it as a
-zip, and upload that zip to a GitHub Release. Private keys, certificates,
-profiles, and API keys must never be committed to the repository or placed in
-`.env` files that can be uploaded accidentally.
-
-The signed build workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml).
-Release versioning and changelog generation are handled by Release Please using
-[`VERSION`](VERSION), [`release-please-config.json`](release-please-config.json),
-and [`.release-please-manifest.json`](.release-please-manifest.json). Configure
-a GitHub Environment named `release`, add the variables and secrets listed
-above, and add a `RELEASE_PLEASE_TOKEN` secret with permission to create release
-PRs and tags. The token must not be the default `GITHUB_TOKEN`, because the
-resulting tag needs to trigger the signed macOS release workflow.
-
-After a Conventional Commit PR is merged into `develop`, Release Please opens
-or updates a release PR. Merge that PR to create the version tag and start the
-signed release automatically:
+Releases are automated with Release Please and GitHub Actions. The complete
+maintainer runbook, including one-time GitHub setup and troubleshooting, is in
+[`CONTRIBUTING.md`](CONTRIBUTING.md#releasing). The short version is:
 
 ```text
-merge feature PR → merge Release Please PR → signed GitHub Release
+Conventional Commit PR
+  → merge into develop
+  → Release Please opens/updates a release PR
+  → merge the release PR
+  → VERSION, CHANGELOG, tag, and GitHub Release are created
+  → signed macOS build, tests, notarization, and zip upload run automatically
 ```
 
+Release versioning is managed by [`VERSION`](VERSION),
+[`release-please-config.json`](release-please-config.json), and
+[`.release-please-manifest.json`](.release-please-manifest.json). Do not
+manually edit `VERSION` for a normal release. Release Please updates it in the
+release PR. The signed build workflow is
+[`.github/workflows/release.yml`](.github/workflows/release.yml).
+
+For downloads hosted on GitHub, the app is Developer ID signed and Apple
+notarized. Apple describes [Developer ID distribution](https://developer.apple.com/support/developer-id/)
+and [notarization](https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases)
+for apps distributed outside the Mac App Store.
+
+The release pipeline keeps repository configuration and signing secrets
+separate. Private keys, certificates, profiles, and API keys must never be
+committed or placed in an uploaded `.env` file.
+
 The workflow can also be started manually with **Actions → Release macOS app →
-Run workflow** and a version such as `1.0.0`.
+Run workflow** and a version such as `1.0.0`; use that only for recovery or a
+deliberate manual release because it bypasses the normal Release Please PR.
 
 The current repository contains only placeholder identifiers:
 
