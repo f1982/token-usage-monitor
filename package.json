@@ -1,0 +1,13 @@
+{
+  "name": "token-usage-monitor",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Development commands for the native Token Usage Monitor macOS app.",
+  "scripts": {
+    "project:generate": "xcodegen generate",
+    "build": "npm run project:generate && xcodebuild build -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor -destination 'platform=macOS,arch=arm64' CODE_SIGNING_ALLOWED=NO",
+    "test": "npm run project:generate && xcodebuild test -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor -destination 'platform=macOS,arch=arm64' CODE_SIGNING_ALLOWED=NO",
+    "build:release": "bash scripts/dev-release.sh --no-github",
+    "statusline:format": "bash scripts/statusline-usage.sh"
+  }
+}

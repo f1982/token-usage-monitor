@@ -28,6 +28,16 @@ SwiftUI + WidgetKit project, and everything runs and stays on your machine.
   cached in the App Group container. Local Project Analytics also caches project
   names, project paths, model names, and first/last-used timestamps as metadata.
 
+## Development commands
+
+This native Swift/Xcode project uses `package.json` only as a lightweight command
+catalog; it has no npm runtime dependencies. Run `npm install` is not required.
+
+- `npm run build` — regenerate the Xcode project and build the app.
+- `npm test` — regenerate the project and run the macOS test suite.
+- `npm run build:release` — build and package a local release without publishing.
+- `cat statusline.json | npm run statusline:format` — write Claude Code statusline data.
+
 ## Where usage data comes from
 
 Claude quota usage is fetched through providers, tried in order:

@@ -5,6 +5,8 @@ enum MenuBarUsageFormatter {
         let id: String
         let name: String
         let detail: String
+        let compactDetail: String
+        let systemImage: String
     }
 
     static func label(
@@ -14,7 +16,7 @@ enum MenuBarUsageFormatter {
     ) -> String {
         let items = values(snapshot: snapshot, codexSession: codexSession, visibleSources: visibleSources)
         guard !items.isEmpty else { return "Usage —" }
-        return items.map { "\($0.shortName) \($0.detail)" }.joined(separator: " · ")
+        return items.map { "\($0.compactDetail)" }.joined(separator: " · ")
     }
 
     static func values(
@@ -28,7 +30,9 @@ enum MenuBarUsageFormatter {
             items.append(Item(
                 id: "claude",
                 name: "Claude Code",
-                detail: "Session \(UsageDisplayFormatting.shortPercentText(percent)) used"
+                detail: "Session \(UsageDisplayFormatting.shortPercentText(percent)) used",
+                compactDetail: UsageDisplayFormatting.shortPercentText(percent),
+                systemImage: "bubble.left.fill"
             ))
         }
 
@@ -40,21 +44,21 @@ enum MenuBarUsageFormatter {
                 items.append(Item(
                     id: "codex",
                     name: "Codex",
-                    detail: "\(UsageDisplayFormatting.compactTokenText(totalTokens))/\(UsageDisplayFormatting.compactTokenText(contextWindow)) (\(UsageDisplayFormatting.shortPercentText(percent)))"
+                    detail: "\(UsageDisplayFormatting.compactTokenText(totalTokens))/\(UsageDisplayFormatting.compactTokenText(contextWindow)) (\(UsageDisplayFormatting.shortPercentText(percent)))",
+                    compactDetail: UsageDisplayFormatting.shortPercentText(percent),
+                    systemImage: "curlybraces"
                 ))
             } else if let quota = snapshot?.codex.first {
                 items.append(Item(
                     id: "codex",
                     name: "Codex",
-                    detail: "Quota \(UsageDisplayFormatting.shortPercentText(quota.percent)) used"
+                    detail: "Quota \(UsageDisplayFormatting.shortPercentText(quota.percent)) used",
+                    compactDetail: UsageDisplayFormatting.shortPercentText(quota.percent),
+                    systemImage: "curlybraces"
                 ))
             }
         }
 
         return items
     }
-}
-
-private extension MenuBarUsageFormatter.Item {
-    var shortName: String { id == "claude" ? "Cl" : "Cx" }
 }

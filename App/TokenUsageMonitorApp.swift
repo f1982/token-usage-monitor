@@ -7,10 +7,12 @@ struct TokenUsageMonitorApp: App {
     @StateObject private var refreshService: UsageRefreshService
     @StateObject private var projectAnalytics: ProjectAnalyticsViewModel
     @StateObject private var codexSessionMonitor: CodexSessionMonitor
+    @State private var menuBarUsageInserted = false
 
     init() {
         let settingsStore = UsageSettingsStore()
         let reloadWidgets = { WidgetCenter.shared.reloadAllTimelines() }
+        _menuBarUsageInserted = State(initialValue: settingsStore.settings.menuBarUsageEnabled)
 
         let aggregator = UsageAggregatorService(
             settingsProvider: { settingsStore.settings },
@@ -52,7 +54,7 @@ struct TokenUsageMonitorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRootView(menuBarUsageInserted: $menuBarUsageInserted)
                 .environmentObject(settingsStore)
                 .environmentObject(refreshService)
                 .environmentObject(projectAnalytics)
@@ -60,7 +62,7 @@ struct TokenUsageMonitorApp: App {
         }
         .windowResizability(.contentSize)
 
-        MenuBarExtra(isInserted: $settingsStore.settings.menuBarUsageEnabled) {
+        MenuBarExtra(isInserted: $menuBarUsageInserted) {
             MenuBarUsageView()
                 .environmentObject(settingsStore)
                 .environmentObject(refreshService)
@@ -72,5 +74,17 @@ struct TokenUsageMonitorApp: App {
                 .environmentObject(codexSessionMonitor)
         }
         .menuBarExtraStyle(.window)
+    }
+}
+
+private struct AppRootView: View {
+    @EnvironmentObject private var settingsStore: UsageSettingsStore
+    @Binding var menuBarUsageInserted: Bool
+
+    var body: some View {
+        ContentView()
+            .onChange(of: settingsStore.settings.menuBarUsageEnabled) { _, enabled in
+                menuBarUsageInserted = enabled
+            }
     }
 }

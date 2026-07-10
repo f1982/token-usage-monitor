@@ -9,11 +9,25 @@ struct MenuBarUsageLabel: View {
     @EnvironmentObject private var settingsStore: UsageSettingsStore
 
     var body: some View {
-        Text(MenuBarUsageFormatter.label(
+        let usage = MenuBarUsageFormatter.values(
             snapshot: refreshService.snapshot,
             codexSession: codexSessionMonitor.session,
             visibleSources: settingsStore.settings.visibleUsageSources
-        ))
+        )
+
+        HStack(spacing: 7) {
+            if usage.isEmpty {
+                Image(systemName: "gauge.with.needle")
+                Text("—")
+            } else {
+                ForEach(usage) { item in
+                    HStack(spacing: 3) {
+                        Image(systemName: item.systemImage)
+                        Text(item.compactDetail)
+                    }
+                }
+            }
+        }
         .monospacedDigit()
     }
 }
@@ -31,7 +45,7 @@ struct MenuBarUsageView: View {
         )
 
         VStack(alignment: .leading, spacing: 8) {
-            Text("Current session")
+            Text("Session usage")
                 .font(.headline)
 
             if usage.isEmpty {

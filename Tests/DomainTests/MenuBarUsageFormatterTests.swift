@@ -30,7 +30,8 @@ final class MenuBarUsageFormatterTests: XCTestCase {
         XCTAssertEqual(values.map(\.name), ["Claude Code", "Codex"])
         XCTAssertEqual(values[0].detail, "Session 34% used")
         XCTAssertEqual(values[1].detail, "12k/100k (12%)")
-        XCTAssertEqual(MenuBarUsageFormatter.label(snapshot: snapshot, codexSession: codex, visibleSources: [.claudeCode, .codex]), "Cl Session 34% used · Cx 12k/100k (12%)")
+        XCTAssertEqual(values.map(\.compactDetail), ["34%", "12%"])
+        XCTAssertEqual(MenuBarUsageFormatter.label(snapshot: snapshot, codexSession: codex, visibleSources: [.claudeCode, .codex]), "34% · 12%")
     }
 
     func testHiddenSourcesAreNotFormatted() {
