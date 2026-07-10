@@ -36,4 +36,18 @@ final class ScopedBookmarkStoreTests: XCTestCase {
         XCTAssertNil(result)
         XCTAssertFalse(didRun)
     }
+
+    func testInvalidBookmarkDoesNotRunOperationOrThrow() {
+        let store = ScopedBookmarkStore(defaults: defaults)
+        defaults.set(Data("moved-or-revoked".utf8), forKey: "scoped-bookmark-statusline-v1")
+        var didRun = false
+
+        let result = store.withAccess(for: .statusline) { _ in
+            didRun = true
+            return true
+        }
+
+        XCTAssertNil(result)
+        XCTAssertFalse(didRun)
+    }
 }
