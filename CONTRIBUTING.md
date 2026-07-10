@@ -155,6 +155,8 @@ A successful release must have:
 - a `vX.Y.Z` tag and non-draft GitHub Release;
 - a successful macOS release workflow;
 - a `TokenUsageMonitor-X.Y.Z.zip` asset on that release.
+- a matching `TokenUsageMonitor-X.Y.Z.zip.sha256` asset; verify it with
+  `shasum -a 256 -c TokenUsageMonitor-X.Y.Z.zip.sha256`.
 
 ## Developer pre-releases
 

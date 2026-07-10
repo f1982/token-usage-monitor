@@ -202,12 +202,14 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           tag="v${RELEASE_VERSION}"
           artifact="dist/TokenUsageMonitor-${RELEASE_VERSION}.zip"
+          shasum -a 256 "$artifact" > "${artifact}.sha256"
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "$artifact" --clobber
+            gh release upload "$tag" "$artifact" "${artifact}.sha256" --clobber
           else
-            gh release create "$tag" "$artifact" \
+            gh release create "$tag" "$artifact" "${artifact}.sha256" \
               --title "Token Usage Monitor ${RELEASE_VERSION}" \
               --generate-notes
           fi
