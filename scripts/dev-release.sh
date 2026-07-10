@@ -23,7 +23,7 @@ cd "$REPO_ROOT"
 PROJECT="TokenUsageMonitor.xcodeproj"
 SCHEME="TokenUsageMonitor"
 APP_NAME="TokenUsageMonitor"
-INFO_PLIST="App/Info.plist"
+VERSION_FILE="VERSION"
 DERIVED="build/dev-release"
 DIST="dist"
 
@@ -50,7 +50,11 @@ if [[ "$PUBLISH_GITHUB" == 1 ]]; then
 fi
 
 # --- version / tag metadata ---------------------------------------------------
-VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$INFO_PLIST")"
+VERSION="$(tr -d '[:space:]' < "$VERSION_FILE")"
+[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || {
+  echo "Invalid version in ${VERSION_FILE}: ${VERSION}" >&2
+  exit 1
+}
 GIT_SHA="$(git rev-parse --short HEAD)"
 STAMP="$(date +%Y%m%d%H%M%S)"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
