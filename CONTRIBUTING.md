@@ -62,6 +62,13 @@ carefully. Prefer the normal Conventional Commit calculation whenever possible.
 
 The signed workflow uses the GitHub Environment named `release`.
 
+The Mac App Store workflow is manually started from **Actions → Build Mac App
+Store app** and uses a separate `app-store` Environment. It archives with the
+Mac App Store distribution identities, exports an App Store `.pkg`, and uploads
+it with Transporter. The App Store target has no Sparkle or other GitHub
+updater dependency; the GitHub workflow and App Store workflow therefore
+produce separate distribution artifacts.
+
 Create the following Environment variables under **Settings → Environments →
 release → Environment variables**:
 
@@ -93,6 +100,21 @@ behavior.
 
 Never commit these values, paste them into an issue, or print them in workflow
 logs. Keep local values in an ignored `.env` file only for local tooling.
+
+The `app-store` Environment needs the same four variables as `release` plus
+these secrets:
+
+| Name | Purpose |
+| --- | --- |
+| `APP_STORE_CERTIFICATE_PASSWORD` | Mac App Store application certificate password |
+| `APP_STORE_CERTIFICATE_P12_BASE64` | Base64-encoded Mac App Store application certificate |
+| `APP_STORE_INSTALLER_CERTIFICATE_PASSWORD` | Mac App Store installer certificate password |
+| `APP_STORE_INSTALLER_CERTIFICATE_P12_BASE64` | Base64-encoded Mac App Store installer certificate |
+| `APP_STORE_APP_PROVISIONING_PROFILE_BASE64` | App Store app provisioning profile |
+| `APP_STORE_WIDGET_PROVISIONING_PROFILE_BASE64` | Widget provisioning profile |
+| `APPLE_API_KEY_ID` | App Store Connect API key ID |
+| `APPLE_API_ISSUER_ID` | App Store Connect API issuer ID |
+| `APPLE_API_PRIVATE_KEY_P8` | App Store Connect API private key |
 
 ### What the workflows do
 

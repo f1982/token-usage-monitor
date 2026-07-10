@@ -1,0 +1,173 @@
+name: Build Mac App Store app
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Marketing version, for example 1.0.2"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  app-store:
+    runs-on: macos-26
+    timeout-minutes: 30
+    environment: app-store
+    env:
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+      APP_BUNDLE_ID: ${{ vars.APP_BUNDLE_ID }}
+      WIDGET_BUNDLE_ID: ${{ vars.WIDGET_BUNDLE_ID }}
+      APP_GROUP_IDENTIFIER: ${{ vars.APP_GROUP_IDENTIFIER }}
+      CERTIFICATE_PASSWORD: ${{ secrets.APP_STORE_CERTIFICATE_PASSWORD }}
+      CERTIFICATE_P12_BASE64: ${{ secrets.APP_STORE_CERTIFICATE_P12_BASE64 }}
+      INSTALLER_CERTIFICATE_PASSWORD: ${{ secrets.APP_STORE_INSTALLER_CERTIFICATE_PASSWORD }}
+      INSTALLER_CERTIFICATE_P12_BASE64: ${{ secrets.APP_STORE_INSTALLER_CERTIFICATE_P12_BASE64 }}
+      APP_PROVISIONING_PROFILE_BASE64: ${{ secrets.APP_STORE_APP_PROVISIONING_PROFILE_BASE64 }}
+      WIDGET_PROVISIONING_PROFILE_BASE64: ${{ secrets.APP_STORE_WIDGET_PROVISIONING_PROFILE_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+      APPLE_API_PRIVATE_KEY_P8: ${{ secrets.APPLE_API_PRIVATE_KEY_P8 }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            HOMEBREW_NO_REQUIRE_TAP_TRUST=1 brew install xcodegen
+          fi
+
+      - name: Select latest Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+          xcodebuild -version
+
+      - name: Validate App Store configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          required=(APPLE_TEAM_ID APP_BUNDLE_ID WIDGET_BUNDLE_ID APP_GROUP_IDENTIFIER
+            CERTIFICATE_PASSWORD CERTIFICATE_P12_BASE64
+            INSTALLER_CERTIFICATE_PASSWORD INSTALLER_CERTIFICATE_P12_BASE64
+            APP_PROVISIONING_PROFILE_BASE64 WIDGET_PROVISIONING_PROFILE_BASE64
+            APPLE_API_KEY_ID APPLE_API_ISSUER_ID APPLE_API_PRIVATE_KEY_P8)
+          for name in "${required[@]}"; do
+            [[ -n "${!name:-}" ]] || { echo "Missing App Store variable: $name" >&2; exit 1; }
+          done
+
+      - name: Import App Store certificates
+        id: signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          keychain="$RUNNER_TEMP/app-store-signing.keychain-db"
+          keychain_password="$(openssl rand -hex 24)"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+
+          import_certificate() {
+            local encoded="$1" password="$2" name="$3"
+            local path="$RUNNER_TEMP/$name.p12"
+            printf '%s' "$encoded" | base64 --decode > "$path"
+            security import "$path" -k "$keychain" -P "$password" \
+              -T /usr/bin/codesign -T /usr/bin/security
+          }
+          import_certificate "$CERTIFICATE_P12_BASE64" "$CERTIFICATE_PASSWORD" app
+          import_certificate "$INSTALLER_CERTIFICATE_P12_BASE64" "$INSTALLER_CERTIFICATE_PASSWORD" installer
+          security list-keychains -d user -s "$keychain"
+          security default-keychain -s "$keychain"
+
+          identity="$(security find-identity -v -p codesigning "$keychain" \
+            | sed -n 's/.*"\(3rd Party Mac Developer Application:.*\)"/\1/p' | head -1)"
+          installer_identity="$(security find-identity -v -p codesigning "$keychain" \
+            | sed -n 's/.*"\(3rd Party Mac Developer Installer:.*\)"/\1/p' | head -1)"
+          [[ -n "$identity" && -n "$installer_identity" ]] || {
+            echo "Mac App Store signing identities not found" >&2
+            exit 1
+          }
+          echo "identity=$identity" >> "$GITHUB_OUTPUT"
+          echo "installer_identity=$installer_identity" >> "$GITHUB_OUTPUT"
+
+      - name: Install provisioning profiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          profiles_dir="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$profiles_dir"
+          install_profile() {
+            local encoded="$1" label="$2" path="$RUNNER_TEMP/$2.provisionprofile"
+            printf '%s' "$encoded" | base64 --decode > "$path"
+            local uuid name
+            uuid="$(security cms -D -i "$path" | plutil -extract UUID raw -o - -)"
+            name="$(security cms -D -i "$path" | plutil -extract Name raw -o - -)"
+            [[ -n "$uuid" && -n "$name" ]] || exit 1
+            cp "$path" "$profiles_dir/$uuid.provisionprofile"
+            printf '%s=%s\n' "${label}_PROVISIONING_PROFILE_SPECIFIER" "$name" >> "$GITHUB_ENV"
+          }
+          install_profile "$APP_PROVISIONING_PROFILE_BASE64" APP_STORE_APP
+          install_profile "$WIDGET_PROVISIONING_PROFILE_BASE64" APP_STORE_WIDGET
+
+      - name: Generate project and run tests
+        run: |
+          xcodegen generate
+          xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
+            -destination 'platform=macOS' test CODE_SIGNING_ALLOWED=NO
+
+      - name: Archive and export App Store package
+        env:
+          SIGNING_IDENTITY: ${{ steps.signing.outputs.identity }}
+          INSTALLER_SIGNING_IDENTITY: ${{ steps.signing.outputs.installer_identity }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/TokenUsageMonitor.xcarchive"
+          xcodebuild -project TokenUsageMonitor.xcodeproj -scheme TokenUsageMonitor \
+            -configuration Release -archivePath "$archive" archive \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" APP_BUNDLE_ID="$APP_BUNDLE_ID" \
+            WIDGET_BUNDLE_ID="$WIDGET_BUNDLE_ID" APP_GROUP_IDENTIFIER="$APP_GROUP_IDENTIFIER" \
+            MARKETING_VERSION="${{ inputs.version }}" CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            APP_PROVISIONING_PROFILE_SPECIFIER="$APP_STORE_APP_PROVISIONING_PROFILE_SPECIFIER" \
+            WIDGET_PROVISIONING_PROFILE_SPECIFIER="$APP_STORE_WIDGET_PROVISIONING_PROFILE_SPECIFIER" \
+            CODE_SIGNING_REQUIRED=YES CODE_SIGNING_ALLOWED=YES
+
+          cat > "$RUNNER_TEMP/export-options.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>$SIGNING_IDENTITY</string>
+            <key>installerSigningCertificate</key><string>$INSTALLER_SIGNING_IDENTITY</string>
+            <key>provisioningProfiles</key><dict>
+              <key>$APP_BUNDLE_ID</key><string>$APP_STORE_APP_PROVISIONING_PROFILE_SPECIFIER</string>
+              <key>$WIDGET_BUNDLE_ID</key><string>$APP_STORE_WIDGET_PROVISIONING_PROFILE_SPECIFIER</string>
+            </dict>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$archive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/export-options.plist"
+          find "$RUNNER_TEMP/export" -maxdepth 1 -type f -name '*.pkg' -exec cp {} "TokenUsageMonitor-${{ inputs.version }}.pkg" \;
+          test -f "TokenUsageMonitor-${{ inputs.version }}.pkg"
+
+      - name: Upload to App Store Connect
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+          if [[ "$APPLE_API_PRIVATE_KEY_P8" == -----BEGIN\ PRIVATE\ KEY-----* ]]; then
+            printf '%s' "$APPLE_API_PRIVATE_KEY_P8" > "$key"
+          else
+            printf '%s' "$APPLE_API_PRIVATE_KEY_P8" | base64 --decode > "$key"
+          fi
+          xcrun iTMSTransporter -m upload -assetFile "TokenUsageMonitor-${{ inputs.version }}.pkg" \
+            -apiKey "$APPLE_API_KEY_ID" -apiIssuer "$APPLE_API_ISSUER_ID" \
+            -v eXtreme
