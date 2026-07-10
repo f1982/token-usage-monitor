@@ -192,15 +192,21 @@ zip, and upload that zip to a GitHub Release. Private keys, certificates,
 profiles, and API keys must never be committed to the repository or placed in
 `.env` files that can be uploaded accidentally.
 
-The current workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml).
-It uses Developer ID signing and notarization and does not currently require
-the two provisioning-profile variables. Configure a GitHub Environment named
-`release`, add the variables and secrets listed above, then publish a release
-by pushing a version tag:
+The signed build workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml).
+Release versioning and changelog generation are handled by Release Please using
+[`VERSION`](VERSION), [`release-please-config.json`](release-please-config.json),
+and [`.release-please-manifest.json`](.release-please-manifest.json). Configure
+a GitHub Environment named `release`, add the variables and secrets listed
+above, and add a `RELEASE_PLEASE_TOKEN` secret with permission to create release
+PRs and tags. The token must not be the default `GITHUB_TOKEN`, because the
+resulting tag needs to trigger the signed macOS release workflow.
 
-```sh
-git tag v1.0.0
-git push origin v1.0.0
+After a Conventional Commit PR is merged into `develop`, Release Please opens
+or updates a release PR. Merge that PR to create the version tag and start the
+signed release automatically:
+
+```text
+merge feature PR → merge Release Please PR → signed GitHub Release
 ```
 
 The workflow can also be started manually with **Actions → Release macOS app →

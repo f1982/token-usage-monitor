@@ -202,7 +202,12 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v${RELEASE_VERSION}" \
-            "dist/TokenUsageMonitor-${RELEASE_VERSION}.zip" \
-            --title "Token Usage Monitor ${RELEASE_VERSION}" \
-            --generate-notes
+          tag="v${RELEASE_VERSION}"
+          artifact="dist/TokenUsageMonitor-${RELEASE_VERSION}.zip"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$artifact" --clobber
+          else
+            gh release create "$tag" "$artifact" \
+              --title "Token Usage Monitor ${RELEASE_VERSION}" \
+              --generate-notes
+          fi
