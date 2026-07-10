@@ -4,7 +4,7 @@ import Foundation
 /// Bookmark data is stored in the App Group so the app and its extension can
 /// share the selection metadata without sharing access to the source files.
 struct ScopedBookmarkStore {
-    enum Key: String {
+    enum Key: String, CaseIterable {
         case claudeProjects
         case codexSessions
         case statusline
@@ -45,8 +45,27 @@ struct ScopedBookmarkStore {
         return url
     }
 
+    /// Runs an operation while the selected directory's security scope is
+    /// active. A missing or invalid bookmark never falls back to a guessed
+    /// path, which is important when running in the App Sandbox.
+    func withAccess<T>(for key: Key, _ operation: (URL) throws -> T) rethrows -> T? {
+        guard let url = resolve(key), url.startAccessingSecurityScopedResource() else {
+            return nil
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+        return try operation(url)
+    }
+
+    func hasBookmark(for key: Key) -> Bool {
+        defaults.data(forKey: storageKey(for: key)) != nil
+    }
+
     func remove(_ key: Key) {
         defaults.removeObject(forKey: storageKey(for: key))
+    }
+
+    func removeAll() {
+        Key.allCases.forEach(remove)
     }
 
     private func storageKey(for key: Key) -> String {

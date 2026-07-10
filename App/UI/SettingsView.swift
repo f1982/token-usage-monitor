@@ -16,6 +16,7 @@ struct SettingsView: View {
             appearanceSection
             projectAnalyticsSection
             experimentalSection
+            localDataSection
             privacySection
         }
         .formStyle(.grouped)
@@ -70,8 +71,9 @@ struct SettingsView: View {
     }
 
     private var statuslineConnectionRow: some View {
-        let statuslineFile = bookmarkStore.resolve(.statusline)?.appendingPathComponent("latest.json")
-        let exists = statuslineFile.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+        let exists = bookmarkStore.withAccess(for: .statusline) { url in
+            FileManager.default.fileExists(atPath: url.appendingPathComponent("latest.json").path)
+        } ?? false
         return VStack(alignment: .leading, spacing: 6) {
             Label(
                 exists ? "Statusline detected" : "Statusline not detected",
@@ -99,6 +101,7 @@ struct SettingsView: View {
                 }
                 .disabled(refreshService.isRefreshing)
             }
+            accessActions(for: .statusline)
         }
         .padding(.vertical, 2)
     }
@@ -125,6 +128,7 @@ struct SettingsView: View {
                 }
                 .disabled(refreshService.isRefreshing)
             }
+            accessActions(for: .codexSessions)
         }
     }
 
@@ -185,6 +189,8 @@ struct SettingsView: View {
                 .disabled(!settingsStore.settings.localProjectAnalyticsEnabled || analytics.isScanning)
             }
 
+            accessActions(for: .claudeProjects)
+
             if settingsStore.settings.localProjectAnalyticsEnabled, !analytics.hasScanned {
                 Text("Click Refresh to scan local logs.")
                     .font(.caption)
@@ -199,6 +205,18 @@ struct SettingsView: View {
             Text("Uses Claude Code's local OAuth token and an undocumented Anthropic usage endpoint. This may break without notice.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    private var localDataSection: some View {
+        Section("Local Data") {
+            Text("Usage totals, project summaries, and usage history are stored in the shared App Group container so the widget can display them. Raw logs and OAuth tokens are not cached.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Button("Clear Cached Usage Data", role: .destructive) {
+                refreshService.clearCachedData()
+                analytics.clearCachedData()
+            }
         }
     }
 
@@ -243,9 +261,34 @@ struct SettingsView: View {
         switch key {
         case .claudeProjects:
             settingsStore.settings.claudeProjectsPath = url.path
+            settingsStore.settings.localProjectAnalyticsEnabled = true
             Task { await analytics.refresh() }
         case .codexSessions:
             settingsStore.settings.codexSessionsPath = url.path
+            Task { await refreshService.refresh(force: true) }
+        case .statusline:
+            Task { await refreshService.refresh(force: true) }
+        }
+    }
+
+    @ViewBuilder
+    private func accessActions(for key: ScopedBookmarkStore.Key) -> some View {
+        HStack {
+            Button("Re-authorize") { chooseDirectory(for: key) }
+            Button("Revoke Access", role: .destructive) { revokeAccess(for: key) }
+                .disabled(!bookmarkStore.hasBookmark(for: key))
+        }
+    }
+
+    private func revokeAccess(for key: ScopedBookmarkStore.Key) {
+        bookmarkStore.remove(key)
+        switch key {
+        case .claudeProjects:
+            settingsStore.settings.claudeProjectsPath = UsageSettings.default.claudeProjectsPath
+            settingsStore.settings.localProjectAnalyticsEnabled = false
+            analytics.clearCachedData()
+        case .codexSessions:
+            settingsStore.settings.codexSessionsPath = UsageSettings.default.codexSessionsPath
             Task { await refreshService.refresh(force: true) }
         case .statusline:
             Task { await refreshService.refresh(force: true) }

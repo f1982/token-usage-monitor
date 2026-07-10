@@ -27,6 +27,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
         PRODUCT_NAME: TokenUsageMonitor
         PROVISIONING_PROFILE_SPECIFIER: $(APP_PROVISIONING_PROFILE_SPECIFIER)
+        CODE_SIGN_ENTITLEMENTS: App/TokenUsageMonitor.entitlements
     info:
       path: App/Info.plist
       properties:
@@ -35,6 +36,8 @@ targets:
     entitlements:
       path: App/TokenUsageMonitor.entitlements
       properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
         com.apple.security.application-groups:
           - $(APP_GROUP_IDENTIFIER)
     dependencies:

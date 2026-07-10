@@ -95,4 +95,13 @@ final class ProjectAnalyticsViewModel: ObservableObject {
             statusNote = "Could not scan Claude project logs."
         }
     }
+
+    func clearCachedData() {
+        AppDataStore().clearCaches()
+        summaries = []
+        generatedAt = nil
+        hasScanned = false
+        statusNote = nil
+        reloadWidgets()
+    }
 }

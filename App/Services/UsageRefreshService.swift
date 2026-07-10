@@ -54,6 +54,13 @@ final class UsageRefreshService: ObservableObject {
         return result
     }
 
+    func clearCachedData() {
+        AppDataStore().clearCaches()
+        snapshot = nil
+        history = []
+        reloadWidgets()
+    }
+
     private func performRefresh(force: Bool) async -> ClaudeUsageSnapshot {
         isRefreshing = true
         defer { isRefreshing = false }
