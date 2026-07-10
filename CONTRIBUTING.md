@@ -1,7 +1,7 @@
 # Contributing and Releasing
 
 This project uses GitHub pull requests, squash merges, and GitHub Actions. The
-default branch is `develop`. Keep generated `TokenUsageMonitor.xcodeproj` files
+default branch is `main`. Keep generated `TokenUsageMonitor.xcodeproj` files
 and local signing configuration out of commits.
 
 ## Pull requests
@@ -34,7 +34,7 @@ The normal release flow requires one maintainer to merge the generated Release
 Please PR. Do not manually create a version tag for a normal release.
 
 ```text
-1. Merge one or more feat/fix PRs into develop.
+1. Merge one or more feat/fix PRs into main.
 2. Wait for the Release Please workflow to create or update a release PR.
 3. Review the proposed VERSION bump and CHANGELOG entries.
 4. Merge the Release Please PR.
@@ -55,7 +55,7 @@ patch bump. Documentation and CI-only changes do not create a release PR on
 their own.
 
 If a specific version is required, add a `Release-As: X.Y.Z` footer to the
-commit body that lands on `develop`, then review the generated release PR
+commit body that lands on `main`, then review the generated release PR
 carefully. Prefer the normal Conventional Commit calculation whenever possible.
 
 ### One-time GitHub setup
@@ -118,7 +118,7 @@ these secrets:
 
 ### What the workflows do
 
-`.github/workflows/release-please.yml` runs after pushes to `develop`. It reads
+`.github/workflows/release-please.yml` runs after pushes to `main`. It reads
 Conventional Commit history, updates the release PR, and manages the version,
 changelog, tag, and GitHub Release.
 

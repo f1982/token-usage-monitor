@@ -190,7 +190,7 @@ maintainer runbook, including one-time GitHub setup and troubleshooting, is in
 
 ```text
 Conventional Commit PR
-  → merge into develop
+  → merge into main
   → Release Please opens/updates a release PR
   → merge the release PR
   → VERSION, CHANGELOG, tag, and GitHub Release are created
