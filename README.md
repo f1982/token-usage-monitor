@@ -217,19 +217,19 @@ The workflow can also be started manually with **Actions â†’ Release macOS app â
 Run workflow** and a version such as `1.0.0`; use that only for recovery or a
 deliberate manual release because it bypasses the normal Release Please PR.
 
-The current repository contains only placeholder identifiers:
+The repository keeps local fallback identifiers only; production identifiers
+are injected at build time from the GitHub `release` and `app-store`
+Environments and are intentionally not committed to this open-source repo:
 
 - `DEVELOPMENT_TEAM: ""`
 - bundle IDs under `com.example.tokenusagemonitor`
 - App Group `group.example.tokenusagemonitor`
 
-Before enabling a signed release workflow, replace these values at build time
-or through an untracked local/CI configuration layer. App and widget targets
-must use matching, team-scoped App Group identifiers. The exact need for a
-provisioning profile depends on the distribution channel and entitlements;
-Apple documents that some macOS entitlements can be claimed without a profile,
-while restricted capabilities and App Groups must match the authorized
-signing configuration.
+App and widget targets must use matching, team-scoped App Group identifiers.
+The exact need for a provisioning profile depends on the distribution channel
+and entitlements; Apple documents that some macOS entitlements can be claimed
+without a profile, while restricted capabilities and App Groups must match the
+authorized signing configuration.
 
 ## Using the widget
 
