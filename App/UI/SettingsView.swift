@@ -3,6 +3,9 @@ import SwiftUI
 import WidgetKit
 
 struct SettingsView: View {
+    private static let privacyPolicyURL = URL(string: "https://github.com/f1982/token-usage-monitor/blob/develop/PRIVACY.md")!
+    private static let supportURL = URL(string: "https://github.com/f1982/token-usage-monitor/blob/develop/SUPPORT.md")!
+
     @EnvironmentObject private var settingsStore: UsageSettingsStore
     @EnvironmentObject private var refreshService: UsageRefreshService
     @EnvironmentObject private var analytics: ProjectAnalyticsViewModel
@@ -242,6 +245,10 @@ struct SettingsView: View {
             Text("All data stays on this Mac. Raw logs, prompt text, and message content are never stored or uploaded. Only aggregated token totals are cached for the widget.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            HStack {
+                Button("Privacy Policy") { NSWorkspace.shared.open(Self.privacyPolicyURL) }
+                Button("Support") { NSWorkspace.shared.open(Self.supportURL) }
+            }
         }
     }
 
