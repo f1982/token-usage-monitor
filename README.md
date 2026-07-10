@@ -47,9 +47,9 @@ Claude quota usage is fetched through providers, tried in order:
    for 10 minutes.
 2. **Local JSONL estimate** — optional, only when enabled in Settings (present
    for forward compatibility; not registered in this build).
-3. **Experimental OAuth usage API** — opt-in, reads the local Claude Code OAuth
-   token against an undocumented endpoint; off by default and marked
-   experimental.
+3. **Experimental OAuth usage API** — opt-in, uses a token the user explicitly
+   pastes into Settings and stores in the macOS Keychain; off by default and
+   marked experimental. The app does not read Claude Code credential files.
 
 The Overview page shows which source produced the current snapshot
 (`Source: Official statusline` / `Local estimate` / `Experimental OAuth`).
@@ -240,6 +240,11 @@ signing configuration.
 
 - Cache TTL 5 min; manual Refresh bypasses TTL. OAuth 429s still trigger a
   2-minute cooldown inside the aggregator.
+- When OAuth is enabled, the app sends only the user-provided token as a
+  Bearer `Authorization` header plus the documented API version and the
+  `oauth-2025-04-20` beta header to `api.anthropic.com/api/oauth/usage`. It does
+  not send project paths, prompts, messages, model names, or cached token
+  totals in that request.
 - Display filters hide sources in the app and widget only; refresh still caches
   all available usage so switching sources back on is immediate.
 - Provider failures fall back to the stale cache with a readable note that

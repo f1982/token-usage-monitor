@@ -7,6 +7,9 @@ protocol TokenReading {
 
 protocol KeychainReading {
     func readGenericPassword(service: String) -> Data?
+    @discardableResult
+    func saveGenericPassword(_ data: Data, service: String) -> Bool
+    func deleteGenericPassword(service: String)
 }
 
 /// Caches the result of credential discovery for the lifetime of the app.
@@ -63,54 +66,63 @@ struct SystemKeychainReader: KeychainReading {
         guard status == errSecSuccess else { return nil }
         return result as? Data
     }
+
+    @discardableResult
+    func saveGenericPassword(_ data: Data, service: String) -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecValueData as String: data,
+        ]
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecDuplicateItem else { return status == errSecSuccess }
+
+        let update: [String: Any] = [kSecValueData as String: data]
+        return SecItemUpdate(
+            [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: service,
+            ] as CFDictionary,
+            update as CFDictionary
+        ) == errSecSuccess
+    }
+
+    func deleteGenericPassword(service: String) {
+        SecItemDelete([
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+        ] as CFDictionary)
+    }
 }
 
-/// Reads the local Claude Code OAuth token. Tries the credentials file first,
-/// then the macOS Keychain. The token is never logged, cached, or shown in UI.
+/// Reads the OAuth token entered by the user and stored in the macOS Keychain.
+/// The app deliberately does not inspect Claude Code's credentials files: doing
+/// so would require an implicit, broad filesystem permission in the sandbox.
 struct ClaudeTokenReader: TokenReading {
-    static let keychainService = "Claude Code-credentials"
-
-    var credentialsFileURL: URL
+    static let keychainService = "com.example.tokenusagemonitor.oauth-token"
     var keychain: KeychainReading
 
     init(
-        credentialsFileURL: URL = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".claude/.credentials.json"),
         keychain: KeychainReading = SystemKeychainReader()
     ) {
-        self.credentialsFileURL = credentialsFileURL
         self.keychain = keychain
     }
 
     func readToken() -> String? {
-        if let data = try? Data(contentsOf: credentialsFileURL),
-           let json = String(data: data, encoding: .utf8),
-           let token = Self.extractToken(fromJSON: json) {
-            return token
-        }
-        if let data = keychain.readGenericPassword(service: Self.keychainService),
-           let json = String(data: data, encoding: .utf8),
-           let token = Self.extractToken(fromJSON: json) {
-            return token
-        }
-        return nil
+        guard let data = keychain.readGenericPassword(service: Self.keychainService),
+              let token = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !token.isEmpty else { return nil }
+        return token
     }
 
-    /// Extracts an access token from raw credentials JSON. Supports both
-    /// `{"claudeAiOauth": {"accessToken": "..."}}` and `{"accessToken": "..."}`.
-    static func extractToken(fromJSON json: String) -> String? {
-        guard let data = json.data(using: .utf8),
-              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-        else { return nil }
+    @discardableResult
+    func saveToken(_ token: String) -> Bool {
+        let value = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !value.isEmpty, let data = value.data(using: .utf8) else { return false }
+        return keychain.saveGenericPassword(data, service: Self.keychainService)
+    }
 
-        if let oauth = object["claudeAiOauth"] as? [String: Any],
-           let token = oauth["accessToken"] as? String,
-           !token.isEmpty {
-            return token
-        }
-        if let token = object["accessToken"] as? String, !token.isEmpty {
-            return token
-        }
-        return nil
+    func removeToken() {
+        keychain.deleteGenericPassword(service: Self.keychainService)
     }
 }

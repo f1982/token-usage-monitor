@@ -107,7 +107,7 @@ final class UsageAggregatorService: QuotaAggregating {
             return "Local estimate not available."
         case .oauthExperimental:
             switch error {
-            case .noCredentials: return "No OAuth token found — log in with Claude Code first."
+            case .noCredentials: return "No OAuth token saved — paste one in Settings first."
             case .unauthorized: return "OAuth token expired — open Claude Code to refresh it."
             case .rateLimited: return "OAuth rate limited — showing cached data."
             case .parseFailure: return "OAuth usage response was not JSON."

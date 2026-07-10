@@ -7,6 +7,8 @@ struct SettingsView: View {
     @EnvironmentObject private var refreshService: UsageRefreshService
     @EnvironmentObject private var analytics: ProjectAnalyticsViewModel
     private let bookmarkStore = ScopedBookmarkStore()
+    private let oauthTokenReader = ClaudeTokenReader()
+    @State private var oauthTokenInput = ""
 
     var body: some View {
         Form {
@@ -202,7 +204,22 @@ struct SettingsView: View {
     private var experimentalSection: some View {
         Section("Experimental") {
             Toggle("Enable Experimental OAuth Usage API", isOn: $settingsStore.settings.experimentalOAuthEnabled)
-            Text("Uses Claude Code's local OAuth token and an undocumented Anthropic usage endpoint. This may break without notice.")
+            SecureField("Paste OAuth token", text: $oauthTokenInput)
+                .textFieldStyle(.roundedBorder)
+            HStack {
+                Button("Save Token") {
+                    guard oauthTokenReader.saveToken(oauthTokenInput) else { return }
+                    oauthTokenInput = ""
+                    Task { await refreshService.refresh(force: true) }
+                }
+                .disabled(oauthTokenInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                Button("Remove Token", role: .destructive) {
+                    oauthTokenReader.removeToken()
+                    settingsStore.settings.experimentalOAuthEnabled = false
+                }
+                .disabled(oauthTokenReader.readToken() == nil)
+            }
+            Text("OAuth is opt-in and uses only a token you paste here. The token is stored in the macOS Keychain and sent as a Bearer token to Anthropic's undocumented usage endpoint. No Claude Code credential file is read.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

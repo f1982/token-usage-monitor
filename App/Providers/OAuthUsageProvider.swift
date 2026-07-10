@@ -1,8 +1,7 @@
 import Foundation
 
-/// Wraps the V0.1 OAuth flow (local token + undocumented usage endpoint) as
-/// an experimental provider. Only called when the user explicitly enabled it
-/// in Settings — the aggregator enforces that.
+/// Wraps the experimental OAuth usage endpoint. The token reader is backed by
+/// a user-managed Keychain item; no Claude Code credential file is inspected.
 struct OAuthUsageProvider: UsageProvider {
     let id = UsageProviderID.oauthExperimental
     let displayName = "Experimental OAuth API"
@@ -17,7 +16,7 @@ struct OAuthUsageProvider: UsageProvider {
         usageClient: UsageFetching = ClaudeUsageClient(),
         now: @escaping () -> Date = Date.init
     ) {
-        self.tokenReader = MemoizingTokenReader(reader: tokenReader)
+        self.tokenReader = tokenReader
         self.usageClient = usageClient
         self.now = now
     }
@@ -31,10 +30,6 @@ struct OAuthUsageProvider: UsageProvider {
             snapshot.provenance = .experimental
             return .success(snapshot, provenance: provenance, fetchedAt: snapshot.fetchedAt)
         } catch let error as UsageClientError {
-            if error == .unauthorized,
-               let memoizingReader = tokenReader as? MemoizingTokenReader {
-                memoizingReader.invalidate()
-            }
             return .failure(Self.mapError(error), provenance: provenance, fetchedAt: now())
         } catch {
             return .failure(.network(error.localizedDescription), provenance: provenance, fetchedAt: now())
