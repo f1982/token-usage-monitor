@@ -11,13 +11,16 @@ struct TokenUsageMonitorApp: App {
 
     init() {
         let settingsStore = UsageSettingsStore()
+        let bookmarkStore = ScopedBookmarkStore()
         let reloadWidgets = { WidgetCenter.shared.reloadAllTimelines() }
         _menuBarUsageInserted = State(initialValue: settingsStore.settings.menuBarUsageEnabled)
 
         let aggregator = UsageAggregatorService(
             settingsProvider: { settingsStore.settings },
             providers: [
-                StatuslineUsageProvider(),
+                StatuslineUsageProvider(fileURL: {
+                    bookmarkStore.resolve(.statusline)?.appendingPathComponent("latest.json")
+                }),
                 OAuthUsageProvider(),
             ]
         )
@@ -27,10 +30,7 @@ struct TokenUsageMonitorApp: App {
             aggregator: aggregator,
             codexUsageProvider: CodexSessionUsageProvider(
                 sessionsDirectory: {
-                    URL(
-                        fileURLWithPath: (settingsStore.settings.codexSessionsPath as NSString).expandingTildeInPath,
-                        isDirectory: true
-                    )
+                    bookmarkStore.resolve(.codexSessions)
                 }
             ),
             cacheStore: UsageCacheStore(),
@@ -38,15 +38,13 @@ struct TokenUsageMonitorApp: App {
         ))
         let codexProvider = CodexSessionUsageProvider(
             sessionsDirectory: {
-                URL(
-                    fileURLWithPath: (settingsStore.settings.codexSessionsPath as NSString).expandingTildeInPath,
-                    isDirectory: true
-                )
+                bookmarkStore.resolve(.codexSessions)
             }
         )
 
         _projectAnalytics = StateObject(wrappedValue: ProjectAnalyticsViewModel(
             settingsStore: settingsStore,
+            bookmarkStore: bookmarkStore,
             reloadWidgets: reloadWidgets
         ))
         _codexSessionMonitor = StateObject(wrappedValue: CodexSessionMonitor(provider: codexProvider))

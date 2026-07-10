@@ -42,10 +42,15 @@ struct StatuslineUsageProvider: UsageProvider {
     let displayName = "Claude Code statusline"
     let provenance = UsageProvenance.official
 
-    var fileURL: URL
+    var fileURL: () -> URL?
     var now: () -> Date
 
-    init(fileURL: URL = Self.defaultFileURL, now: @escaping () -> Date = Date.init) {
+    init(fileURL: URL? = Self.defaultFileURL, now: @escaping () -> Date = Date.init) {
+        self.fileURL = { fileURL }
+        self.now = now
+    }
+
+    init(fileURL: @escaping () -> URL?, now: @escaping () -> Date = Date.init) {
         self.fileURL = fileURL
         self.now = now
     }
@@ -53,7 +58,8 @@ struct StatuslineUsageProvider: UsageProvider {
     func fetchQuotaUsage() async -> UsageProviderResult<ClaudeUsageSnapshot> {
         let currentTime = now()
 
-        guard let data = try? Data(contentsOf: fileURL) else {
+        guard let fileURL = fileURL(),
+              let data = Self.readData(from: fileURL) else {
             return .failure(.missing, provenance: provenance, fetchedAt: currentTime)
         }
         guard let state = try? JSONDecoder().decode(StatuslineStateFile.self, from: data) else {
@@ -77,6 +83,14 @@ struct StatuslineUsageProvider: UsageProvider {
             )
         }
         return .success(snapshot, provenance: provenance, fetchedAt: currentTime)
+    }
+
+    private static func readData(from fileURL: URL) -> Data? {
+        let didStartAccess = fileURL.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess { fileURL.stopAccessingSecurityScopedResource() }
+        }
+        return try? Data(contentsOf: fileURL)
     }
 
     // MARK: - Mapping

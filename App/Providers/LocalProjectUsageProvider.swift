@@ -20,23 +20,27 @@ protocol ProjectUsageProviding {
 /// Local Project Analytics setting before invoking. Files are streamed line
 /// by line; raw lines and message content are never retained.
 struct LocalProjectUsageProvider: ProjectUsageProviding {
-    var rootPath: String
+    let rootURL: URL
 
     init(rootPath: String = UsageSettings.default.claudeProjectsPath) {
-        self.rootPath = rootPath
+        self.rootURL = URL(fileURLWithPath: (rootPath as NSString).expandingTildeInPath)
     }
 
-    var rootURL: URL {
-        URL(fileURLWithPath: (rootPath as NSString).expandingTildeInPath)
+    init(rootURL: URL) {
+        self.rootURL = rootURL
     }
 
     func fetchProjectSummaries(range: ProjectUsageTimeRange, now: Date = Date()) async throws -> [ProjectUsageSummary] {
         let root = rootURL
+        let didStartAccess = root.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess { root.stopAccessingSecurityScopedResource() }
+        }
         var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDirectory),
               isDirectory.boolValue
         else {
-            throw ProjectScanError.rootNotFound(rootPath)
+            throw ProjectScanError.rootNotFound(root.path)
         }
 
         var events: [ProjectUsageEvent] = []

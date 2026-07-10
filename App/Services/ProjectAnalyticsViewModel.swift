@@ -13,7 +13,8 @@ final class ProjectAnalyticsViewModel: ObservableObject {
 
     private let settingsStore: UsageSettingsStore
     private let cacheStore: ProjectUsageCacheStoring
-    private let makeProvider: (String) -> ProjectUsageProviding
+    private let makeProvider: (URL) -> ProjectUsageProviding
+    private let bookmarkStore: ScopedBookmarkStore
     private let reloadWidgets: () -> Void
     private let now: () -> Date
 
@@ -23,13 +24,15 @@ final class ProjectAnalyticsViewModel: ObservableObject {
     init(
         settingsStore: UsageSettingsStore,
         cacheStore: ProjectUsageCacheStoring = ProjectUsageCacheStore(),
-        makeProvider: @escaping (String) -> ProjectUsageProviding = { LocalProjectUsageProvider(rootPath: $0) },
+        makeProvider: @escaping (URL) -> ProjectUsageProviding = { LocalProjectUsageProvider(rootURL: $0) },
+        bookmarkStore: ScopedBookmarkStore = ScopedBookmarkStore(),
         reloadWidgets: @escaping () -> Void = {},
         now: @escaping () -> Date = Date.init
     ) {
         self.settingsStore = settingsStore
         self.cacheStore = cacheStore
         self.makeProvider = makeProvider
+        self.bookmarkStore = bookmarkStore
         self.reloadWidgets = reloadWidgets
         self.now = now
         self.range = settingsStore.settings.projectAnalyticsDefaultRange
@@ -66,8 +69,11 @@ final class ProjectAnalyticsViewModel: ObservableObject {
         defer { isScanning = false }
         statusNote = nil
 
-        let rootPath = settingsStore.settings.claudeProjectsPath
-        let provider = makeProvider(rootPath)
+        guard let rootURL = bookmarkStore.resolve(.claudeProjects) else {
+            statusNote = "Choose the Claude Projects folder before scanning."
+            return
+        }
+        let provider = makeProvider(rootURL)
         let selectedRange = range
 
         do {
@@ -78,7 +84,7 @@ final class ProjectAnalyticsViewModel: ObservableObject {
             cacheStore.write(ProjectUsageCache(
                 schemaVersion: ProjectUsageCacheStore.schemaVersion,
                 generatedAt: now(),
-                rootPath: rootPath,
+                rootPath: rootURL.path,
                 timeRange: selectedRange,
                 summaries: result
             ))

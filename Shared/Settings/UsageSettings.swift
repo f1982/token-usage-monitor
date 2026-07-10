@@ -117,6 +117,8 @@ struct UsageSettings: Codable, Equatable {
     var quotaSourceMode: QuotaSourceMode
     var visibleUsageSources: Set<UsageDisplaySource>
     var localProjectAnalyticsEnabled: Bool
+    /// Display-only paths retained for migration and user feedback. Access is
+    /// granted only through ScopedBookmarkStore.
     var claudeProjectsPath: String
     var codexSessionsPath: String
     var experimentalOAuthEnabled: Bool

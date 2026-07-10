@@ -16,7 +16,7 @@ struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProvidi
             .appendingPathComponent(".codex/sessions")
     }
 
-    var sessionsDirectory: () -> URL
+    var sessionsDirectory: () -> URL?
     private let scanner: CodexSessionScanner
 
     init(
@@ -28,7 +28,7 @@ struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProvidi
     }
 
     init(
-        sessionsDirectory: @escaping () -> URL,
+        sessionsDirectory: @escaping () -> URL?,
         fileManager: FileManager = .default
     ) {
         self.sessionsDirectory = sessionsDirectory
@@ -36,11 +36,13 @@ struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProvidi
     }
 
     func fetchCodexLimits() async -> [UsageLimit] {
-        await scanner.fetchLimits(in: sessionsDirectory())
+        guard let directory = sessionsDirectory() else { return [] }
+        return await scanner.fetchLimits(in: directory)
     }
 
     func fetchActiveSession() async -> CodexActiveSession? {
-        await scanner.fetchActiveSession(in: sessionsDirectory())
+        guard let directory = sessionsDirectory() else { return nil }
+        return await scanner.fetchActiveSession(in: directory)
     }
 
     static func limits(fromJSONL contents: String) -> [UsageLimit] {
@@ -175,6 +177,10 @@ private actor CodexSessionScanner {
     }
 
     func fetchLimits(in directory: URL) -> [UsageLimit] {
+        let didStartAccess = directory.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess { directory.stopAccessingSecurityScopedResource() }
+        }
         guard let fileURL = latestSessionFile(in: directory),
               let data = try? Data(contentsOf: fileURL),
               let contents = String(data: data, encoding: .utf8) else {
@@ -185,6 +191,10 @@ private actor CodexSessionScanner {
     }
 
     func fetchActiveSession(in directory: URL) -> CodexActiveSession? {
+        let didStartAccess = directory.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess { directory.stopAccessingSecurityScopedResource() }
+        }
         guard let fileURL = latestSessionFile(in: directory),
               let data = try? Data(contentsOf: fileURL),
               let contents = String(data: data, encoding: .utf8) else {

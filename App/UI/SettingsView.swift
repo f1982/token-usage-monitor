@@ -6,6 +6,7 @@ struct SettingsView: View {
     @EnvironmentObject private var settingsStore: UsageSettingsStore
     @EnvironmentObject private var refreshService: UsageRefreshService
     @EnvironmentObject private var analytics: ProjectAnalyticsViewModel
+    private let bookmarkStore = ScopedBookmarkStore()
 
     var body: some View {
         Form {
@@ -27,9 +28,6 @@ struct SettingsView: View {
         }
         .onChange(of: settingsStore.settings.visibleUsageSources) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
-        }
-        .onChange(of: settingsStore.settings.codexSessionsPath) { _, _ in
-            Task { await refreshService.refresh(force: true) }
         }
         .onChange(of: settingsStore.settings.localProjectAnalyticsEnabled) { _, _ in
             // The widget shows/hides its projects section based on this setting.
@@ -72,7 +70,8 @@ struct SettingsView: View {
     }
 
     private var statuslineConnectionRow: some View {
-        let exists = FileManager.default.fileExists(atPath: StatuslineUsageProvider.defaultFileURL.path)
+        let statuslineFile = bookmarkStore.resolve(.statusline)?.appendingPathComponent("latest.json")
+        let exists = statuslineFile.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
         return VStack(alignment: .leading, spacing: 6) {
             Label(
                 exists ? "Statusline detected" : "Statusline not detected",
@@ -89,6 +88,9 @@ struct SettingsView: View {
             .foregroundStyle(.secondary)
 
             HStack {
+                Button("Choose Statusline Folder") {
+                    chooseDirectory(for: .statusline)
+                }
                 Button("Open Statusline Folder") {
                     openStatuslineFolder()
                 }
@@ -103,15 +105,18 @@ struct SettingsView: View {
 
     private var codexSection: some View {
         Section("Codex") {
-            TextField("Codex Sessions Path", text: $settingsStore.settings.codexSessionsPath)
-                .textFieldStyle(.roundedBorder)
-                .disableAutocorrection(true)
+            Text(settingsStore.settings.codexSessionsPath)
+                .font(.caption.monospaced())
+                .textSelection(.enabled)
 
             Text("Reads local Codex session JSONL files and uses the newest token_count rate limit event. Prompt and message content are not stored.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             HStack {
+                Button("Choose Codex Sessions Folder") {
+                    chooseDirectory(for: .codexSessions)
+                }
                 Button("Open Codex Sessions Folder") {
                     openCodexSessionsFolder()
                 }
@@ -152,9 +157,9 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            TextField("Claude Projects Path", text: $settingsStore.settings.claudeProjectsPath)
-                .textFieldStyle(.roundedBorder)
-                .disableAutocorrection(true)
+            Text(settingsStore.settings.claudeProjectsPath)
+                .font(.caption.monospaced())
+                .textSelection(.enabled)
 
             if settingsStore.settings.localProjectAnalyticsEnabled {
                 Picker("Auto-refresh", selection: $settingsStore.settings.projectAnalyticsRefreshInterval) {
@@ -168,6 +173,9 @@ struct SettingsView: View {
             }
 
             HStack {
+                Button("Choose Claude Projects Folder") {
+                    chooseDirectory(for: .claudeProjects)
+                }
                 Button("Open Claude Projects Folder") {
                     openProjectsFolder()
                 }
@@ -203,18 +211,45 @@ struct SettingsView: View {
     }
 
     private func openProjectsFolder() {
-        let path = (settingsStore.settings.claudeProjectsPath as NSString).expandingTildeInPath
-        NSWorkspace.shared.open(URL(fileURLWithPath: path, isDirectory: true))
+        if let url = bookmarkStore.resolve(.claudeProjects) {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func openStatuslineFolder() {
-        let folderURL = StatuslineUsageProvider.defaultFileURL.deletingLastPathComponent()
-        NSWorkspace.shared.open(folderURL)
+        if let url = bookmarkStore.resolve(.statusline) {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func openCodexSessionsFolder() {
-        let path = (settingsStore.settings.codexSessionsPath as NSString).expandingTildeInPath
-        NSWorkspace.shared.open(URL(fileURLWithPath: path, isDirectory: true))
+        if let url = bookmarkStore.resolve(.codexSessions) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func chooseDirectory(for key: ScopedBookmarkStore.Key) {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.prompt = "Allow Access"
+
+        guard panel.runModal() == .OK,
+              let url = panel.url,
+              bookmarkStore.save(url, for: key) else { return }
+
+        switch key {
+        case .claudeProjects:
+            settingsStore.settings.claudeProjectsPath = url.path
+            Task { await analytics.refresh() }
+        case .codexSessions:
+            settingsStore.settings.codexSessionsPath = url.path
+            Task { await refreshService.refresh(force: true) }
+        case .statusline:
+            Task { await refreshService.refresh(force: true) }
+        }
     }
 
     private func sourceBinding(_ source: UsageDisplaySource) -> Binding<Bool> {
