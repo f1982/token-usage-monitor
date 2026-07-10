@@ -113,6 +113,7 @@ enum ProjectAnalyticsRefreshInterval: String, Codable, CaseIterable, Identifiabl
 }
 
 struct UsageSettings: Codable, Equatable {
+    var menuBarUsageEnabled: Bool
     var quotaSourceMode: QuotaSourceMode
     var visibleUsageSources: Set<UsageDisplaySource>
     var localProjectAnalyticsEnabled: Bool
@@ -124,6 +125,7 @@ struct UsageSettings: Codable, Equatable {
     var usageChartStyle: UsageChartStyle
 
     static let `default` = UsageSettings(
+        menuBarUsageEnabled: false,
         quotaSourceMode: .officialStatuslineOnly,
         visibleUsageSources: Set(UsageDisplaySource.allCases),
         localProjectAnalyticsEnabled: false,
@@ -136,6 +138,7 @@ struct UsageSettings: Codable, Equatable {
     )
 
     init(
+        menuBarUsageEnabled: Bool = false,
         quotaSourceMode: QuotaSourceMode,
         visibleUsageSources: Set<UsageDisplaySource> = Set(UsageDisplaySource.allCases),
         localProjectAnalyticsEnabled: Bool,
@@ -146,6 +149,7 @@ struct UsageSettings: Codable, Equatable {
         projectAnalyticsRefreshInterval: ProjectAnalyticsRefreshInterval = .hourly,
         usageChartStyle: UsageChartStyle
     ) {
+        self.menuBarUsageEnabled = menuBarUsageEnabled
         self.quotaSourceMode = quotaSourceMode
         self.visibleUsageSources = visibleUsageSources.isEmpty ? Set(UsageDisplaySource.allCases) : visibleUsageSources
         self.localProjectAnalyticsEnabled = localProjectAnalyticsEnabled
@@ -162,6 +166,8 @@ struct UsageSettings: Codable, Equatable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let defaults = UsageSettings.default
+        menuBarUsageEnabled = (try? container.decodeIfPresent(Bool.self, forKey: .menuBarUsageEnabled))
+            .flatMap { $0 } ?? defaults.menuBarUsageEnabled
         quotaSourceMode = (try? container.decodeIfPresent(QuotaSourceMode.self, forKey: .quotaSourceMode))
             .flatMap { $0 } ?? defaults.quotaSourceMode
         let decodedSources = (try? container.decodeIfPresent(Set<UsageDisplaySource>.self, forKey: .visibleUsageSources))

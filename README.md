@@ -15,6 +15,9 @@ SwiftUI + WidgetKit project, and everything runs and stays on your machine.
 - **Display settings** — choose whether the overview and widget show Claude
   Code, Codex, or both. The setting is stored in the App Group so the widget
   follows the same selection.
+- **Menu bar session usage** — optionally show Claude Code's session quota and
+  Codex's current session tokens/context percentage directly in the macOS menu
+  bar. Enable it in Settings → Display; it is off by default.
 - **Projects** (opt-in) — scans `~/.claude/projects/**/*.jsonl` and aggregates
   per-project token totals (input / output / cache), message counts, models,
   and first/last-used times across Today / 7 Days / 30 Days / All.

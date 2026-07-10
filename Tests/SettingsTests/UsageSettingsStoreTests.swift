@@ -20,6 +20,7 @@ final class UsageSettingsStoreTests: XCTestCase {
         let store = UsageSettingsStore(defaults: defaults)
 
         XCTAssertEqual(store.settings.quotaSourceMode, .officialStatuslineOnly)
+        XCTAssertFalse(store.settings.menuBarUsageEnabled, "menu bar usage must default to off")
         XCTAssertFalse(store.settings.localProjectAnalyticsEnabled, "local analytics must default to off")
         XCTAssertFalse(store.settings.experimentalOAuthEnabled, "experimental OAuth must default to off")
         XCTAssertEqual(store.settings.visibleUsageSources, Set(UsageDisplaySource.allCases))
@@ -32,6 +33,7 @@ final class UsageSettingsStoreTests: XCTestCase {
     func testSettingsPersistAndReload() {
         let store = UsageSettingsStore(defaults: defaults)
         store.settings.quotaSourceMode = .statuslineThenLocalThenOAuth
+        store.settings.menuBarUsageEnabled = true
         store.settings.localProjectAnalyticsEnabled = true
         store.settings.claudeProjectsPath = "~/custom/projects"
         store.settings.codexSessionsPath = "~/custom/codex/sessions"
@@ -42,6 +44,7 @@ final class UsageSettingsStoreTests: XCTestCase {
         let reloaded = UsageSettingsStore(defaults: defaults)
 
         XCTAssertEqual(reloaded.settings.quotaSourceMode, .statuslineThenLocalThenOAuth)
+        XCTAssertTrue(reloaded.settings.menuBarUsageEnabled)
         XCTAssertTrue(reloaded.settings.localProjectAnalyticsEnabled)
         XCTAssertEqual(reloaded.settings.claudeProjectsPath, "~/custom/projects")
         XCTAssertEqual(reloaded.settings.codexSessionsPath, "~/custom/codex/sessions")
@@ -60,6 +63,7 @@ final class UsageSettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.settings.usageChartStyle, .progressBar)
         XCTAssertEqual(store.settings.visibleUsageSources, Set(UsageDisplaySource.allCases))
         XCTAssertEqual(store.settings.codexSessionsPath, "~/.codex/sessions")
+        XCTAssertFalse(store.settings.menuBarUsageEnabled)
     }
 
     func testEmptyVisibleSourcesFallsBackToAllSources() {

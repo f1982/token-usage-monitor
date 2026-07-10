@@ -47,7 +47,11 @@ struct SettingsView: View {
         Section("Display") {
             Toggle("Show Claude Code", isOn: sourceBinding(.claudeCode))
             Toggle("Show Codex", isOn: sourceBinding(.codex))
+            Toggle("Show session usage in menu bar", isOn: $settingsStore.settings.menuBarUsageEnabled)
             Text("Choose which usage products appear in the overview and widget. At least one source stays enabled.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text("When enabled, the Mac menu bar shows Claude Code session quota and Codex session tokens/context usage.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

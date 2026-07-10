@@ -59,5 +59,18 @@ struct TokenUsageMonitorApp: App {
                 .environmentObject(codexSessionMonitor)
         }
         .windowResizability(.contentSize)
+
+        MenuBarExtra(isInserted: $settingsStore.settings.menuBarUsageEnabled) {
+            MenuBarUsageView()
+                .environmentObject(settingsStore)
+                .environmentObject(refreshService)
+                .environmentObject(codexSessionMonitor)
+        } label: {
+            MenuBarUsageLabel()
+                .environmentObject(settingsStore)
+                .environmentObject(refreshService)
+                .environmentObject(codexSessionMonitor)
+        }
+        .menuBarExtraStyle(.window)
     }
 }
