@@ -24,30 +24,30 @@ struct TokenUsageMonitorApp: App {
                 OAuthUsageProvider(),
             ]
         )
-
-        _settingsStore = StateObject(wrappedValue: settingsStore)
-        _refreshService = StateObject(wrappedValue: UsageRefreshService(
-            aggregator: aggregator,
-            codexUsageProvider: CodexSessionUsageProvider(
-                sessionsDirectory: {
-                    bookmarkStore.resolve(.codexSessions)
-                }
-            ),
-            cacheStore: UsageCacheStore(),
-            reloadWidgets: reloadWidgets
-        ))
-        let codexProvider = CodexSessionUsageProvider(
+        let codexSessionProvider = CodexSessionUsageProvider(
             sessionsDirectory: {
                 bookmarkStore.resolve(.codexSessions)
             }
         )
+        let codexUsageProvider = FallbackCodexUsageProvider(providers: [
+            CodexAppServerUsageProvider(),
+            codexSessionProvider,
+        ])
+
+        _settingsStore = StateObject(wrappedValue: settingsStore)
+        _refreshService = StateObject(wrappedValue: UsageRefreshService(
+            aggregator: aggregator,
+            codexUsageProvider: codexUsageProvider,
+            cacheStore: UsageCacheStore(),
+            reloadWidgets: reloadWidgets
+        ))
 
         _projectAnalytics = StateObject(wrappedValue: ProjectAnalyticsViewModel(
             settingsStore: settingsStore,
             bookmarkStore: bookmarkStore,
             reloadWidgets: reloadWidgets
         ))
-        _codexSessionMonitor = StateObject(wrappedValue: CodexSessionMonitor(provider: codexProvider))
+        _codexSessionMonitor = StateObject(wrappedValue: CodexSessionMonitor(provider: codexSessionProvider))
     }
 
     var body: some Scene {

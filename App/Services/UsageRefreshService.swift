@@ -95,6 +95,12 @@ final class UsageRefreshService: ObservableObject {
 
     private func publish(_ result: ClaudeUsageSnapshot) async -> ClaudeUsageSnapshot {
         let updated = await addingCodexLimits(to: result)
+        if updated.codex != result.codex {
+            // Codex refreshes independently. Persist its fresh rows even when
+            // the Claude source failed so the widget does not remain stale.
+            cacheStore.write(updated)
+            reloadWidgets()
+        }
         snapshot = updated
         return updated
     }

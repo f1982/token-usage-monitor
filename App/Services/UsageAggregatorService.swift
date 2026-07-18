@@ -72,12 +72,16 @@ final class UsageAggregatorService: QuotaAggregating {
     }
 
     static func providerOrder(for settings: UsageSettings) -> [UsageProviderID] {
-        var order: [UsageProviderID] = [.statusline]
-        if settings.quotaSourceMode.allowsLocalEstimate {
-            order.append(.localEstimate)
-        }
+        var order: [UsageProviderID] = []
+        // The opt-in OAuth endpoint is the only source that can return the
+        // complete live set (session, all-model weekly, and model-scoped
+        // weekly limits). A fresh statusline snapshot is still the fallback.
         if settings.quotaSourceMode.allowsOAuth, settings.experimentalOAuthEnabled {
             order.append(.oauthExperimental)
+        }
+        order.append(.statusline)
+        if settings.quotaSourceMode.allowsLocalEstimate {
+            order.append(.localEstimate)
         }
         return order
     }

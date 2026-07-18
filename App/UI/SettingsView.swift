@@ -30,6 +30,9 @@ struct SettingsView: View {
             Task { await refreshService.refresh(force: true) }
         }
         .onChange(of: settingsStore.settings.experimentalOAuthEnabled) { _, _ in
+            if settingsStore.settings.experimentalOAuthEnabled {
+                settingsStore.settings.quotaSourceMode = .statuslineThenLocalThenOAuth
+            }
             Task { await refreshService.refresh(force: true) }
         }
         .onChange(of: settingsStore.settings.visibleUsageSources) { _, _ in
@@ -117,7 +120,7 @@ struct SettingsView: View {
                 .font(.caption.monospaced())
                 .textSelection(.enabled)
 
-            Text("Reads local Codex session JSONL files and uses the newest token_count rate limit event. Prompt and message content are not stored.")
+            Text("Reads current account limits through the installed Codex CLI when available. Local session JSONL is used as a fallback; prompt and message content are not stored.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -222,7 +225,7 @@ struct SettingsView: View {
                 }
                 .disabled(oauthTokenReader.readToken() == nil)
             }
-            Text("OAuth is opt-in and uses only a token you paste here. The token is stored in the macOS Keychain and sent as a Bearer token to Anthropic's undocumented usage endpoint. No Claude Code credential file is read.")
+            Text("Run `claude setup-token` in Terminal, then paste the generated long-lived token here. When enabled, live OAuth usage is preferred over statusline data. The token is stored in the macOS Keychain; no Claude Code credential file is read.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

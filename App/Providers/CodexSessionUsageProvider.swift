@@ -8,8 +8,8 @@ protocol CodexActiveSessionProviding {
     func fetchActiveSession() async -> CodexActiveSession?
 }
 
-/// Reads Codex rate limits from the latest local session JSONL. Codex emits
-/// `token_count` events with `rate_limits.primary` and `rate_limits.secondary`.
+/// Reads Codex rate limits from local session JSONL as a fallback when the
+/// account-level app-server request is unavailable.
 struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProviding {
     static var defaultSessionsDirectory: URL {
         FileManager.default.homeDirectoryForCurrentUser
@@ -55,7 +55,8 @@ struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProvidi
                   let rateLimits = event.payload.rateLimits else {
                 continue
             }
-            return makeLimits(from: rateLimits)
+            let limits = CodexUsageLimitMapper.limits(from: [rateLimits])
+            if !limits.isEmpty { return limits }
         }
         return []
     }
@@ -112,59 +113,6 @@ struct CodexSessionUsageProvider: CodexUsageProviding, CodexActiveSessionProvidi
         )
     }
 
-    private static func makeLimits(from rateLimits: CodexRateLimits) -> [UsageLimit] {
-        var limits: [UsageLimit] = []
-        if let primary = makeLimit(
-            rateLimits.primary,
-            id: "codex-primary",
-            kind: "codex_primary",
-            defaultLabel: label(forWindowMinutes: rateLimits.primary.windowMinutes, fallback: "Codex 5h")
-        ) {
-            limits.append(primary)
-        }
-        if let secondary = makeLimit(
-            rateLimits.secondary,
-            id: "codex-secondary",
-            kind: "codex_secondary",
-            defaultLabel: label(forWindowMinutes: rateLimits.secondary.windowMinutes, fallback: "Codex weekly")
-        ) {
-            limits.append(secondary)
-        }
-        return limits
-    }
-
-    private static func makeLimit(
-        _ entry: CodexRateLimitEntry,
-        id: String,
-        kind: String,
-        defaultLabel: String
-    ) -> UsageLimit? {
-        guard let percent = entry.usedPercent else { return nil }
-        return UsageLimit(
-            id: id,
-            kind: kind,
-            label: defaultLabel,
-            percent: percent,
-            resetsAt: entry.resetsAt.map { Date(timeIntervalSince1970: TimeInterval($0)) }
-        )
-    }
-
-    private static func label(forWindowMinutes minutes: Int?, fallback: String) -> String {
-        switch minutes {
-        case 300:
-            return "Codex 5h"
-        case 10_080:
-            return "Codex weekly"
-        case let minutes? where minutes % 1_440 == 0:
-            return "Codex \(minutes / 1_440)d"
-        case let minutes? where minutes % 60 == 0:
-            return "Codex \(minutes / 60)h"
-        case let minutes?:
-            return "Codex \(minutes)m"
-        default:
-            return fallback
-        }
-    }
 }
 
 /// Performs filesystem work on its own actor so quota refreshes do not block
@@ -181,13 +129,15 @@ private actor CodexSessionScanner {
         defer {
             if didStartAccess { directory.stopAccessingSecurityScopedResource() }
         }
-        guard let fileURL = latestSessionFile(in: directory),
-              let data = try? Data(contentsOf: fileURL),
-              let contents = String(data: data, encoding: .utf8) else {
-            return []
+        for fileURL in sessionFiles(in: directory).prefix(20) {
+            guard let data = try? Data(contentsOf: fileURL),
+                  let contents = String(data: data, encoding: .utf8) else {
+                continue
+            }
+            let limits = CodexSessionUsageProvider.limits(fromJSONL: contents)
+            if !limits.isEmpty { return limits }
         }
-
-        return CodexSessionUsageProvider.limits(fromJSONL: contents)
+        return []
     }
 
     func fetchActiveSession(in directory: URL) -> CodexActiveSession? {
@@ -195,7 +145,7 @@ private actor CodexSessionScanner {
         defer {
             if didStartAccess { directory.stopAccessingSecurityScopedResource() }
         }
-        guard let fileURL = latestSessionFile(in: directory),
+        guard let fileURL = sessionFiles(in: directory).first,
               let data = try? Data(contentsOf: fileURL),
               let contents = String(data: data, encoding: .utf8) else {
             return nil
@@ -204,13 +154,13 @@ private actor CodexSessionScanner {
         return CodexSessionUsageProvider.activeSession(fromJSONL: contents)
     }
 
-    private func latestSessionFile(in directory: URL) -> URL? {
+    private func sessionFiles(in directory: URL) -> [URL] {
         guard let enumerator = fileManager.enumerator(
             at: directory,
             includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey],
             options: [.skipsHiddenFiles]
         ) else {
-            return nil
+            return []
         }
 
         return enumerator
@@ -219,10 +169,10 @@ private actor CodexSessionScanner {
             .filter { url in
                 (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
             }
-            .max { lhs, rhs in
+            .sorted { lhs, rhs in
                 let lhsDate = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
                 let rhsDate = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
-                return lhsDate < rhsDate
+                return lhsDate > rhsDate
             }
     }
 }
@@ -231,27 +181,10 @@ private struct CodexTokenCountEvent: Decodable {
     var payload: Payload
 
     struct Payload: Decodable {
-        var rateLimits: CodexRateLimits?
+        var rateLimits: CodexRateLimitSnapshot?
 
         enum CodingKeys: String, CodingKey {
             case rateLimits = "rate_limits"
         }
-    }
-}
-
-private struct CodexRateLimits: Decodable {
-    var primary: CodexRateLimitEntry
-    var secondary: CodexRateLimitEntry
-}
-
-private struct CodexRateLimitEntry: Decodable {
-    var usedPercent: Double?
-    var windowMinutes: Int?
-    var resetsAt: Int?
-
-    enum CodingKeys: String, CodingKey {
-        case usedPercent = "used_percent"
-        case windowMinutes = "window_minutes"
-        case resetsAt = "resets_at"
     }
 }

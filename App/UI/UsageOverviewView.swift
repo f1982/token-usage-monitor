@@ -204,7 +204,7 @@ struct UsageOverviewView: View {
             }
             HStack {
                 if let provenance = refreshService.snapshot?.provenance {
-                    Text("Source: \(provenance.displayName)")
+                    Text("Claude source: \(provenance.displayName)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -229,13 +229,14 @@ struct UsageOverviewView: View {
             Label("Refreshing", systemImage: "arrow.triangle.2.circlepath")
                 .foregroundStyle(.secondary)
                 .font(.caption)
-        } else if let fetchedAt = refreshService.snapshot?.fetchedAt {
+        } else if refreshService.snapshot?.provenance != nil,
+                  let fetchedAt = refreshService.snapshot?.fetchedAt {
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 let age = context.date.timeIntervalSince(fetchedAt)
                 let isStale = age >= UsageRefreshService.cacheTTL
                 Label(
-                    isStale ? "Stale · \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt, now: context.date))" :
-                        "Updated \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt, now: context.date))",
+                    isStale ? "Claude stale · \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt, now: context.date))" :
+                        "Claude updated \(UsageDisplayFormatting.cacheAgeText(fetchedAt: fetchedAt, now: context.date))",
                     systemImage: isStale ? "exclamationmark.triangle" : "checkmark.circle"
                 )
                 .foregroundStyle(isStale ? .orange : .secondary)

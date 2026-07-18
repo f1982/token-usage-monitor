@@ -1,6 +1,27 @@
 import XCTest
 
 final class ClaudeUsageClientMappingTests: XCTestCase {
+    func testMapsCurrentTopLevelUsageBuckets() throws {
+        let json = #"""
+        {
+          "five_hour": {"utilization": 37, "resets_at": "2026-07-18T05:10:00Z"},
+          "seven_day": {"utilization": 29, "resets_at": "2026-07-20T19:59:00Z"},
+          "seven_day_fable": {"utilization": 19, "resets_at": "2026-07-20T19:59:00Z"},
+          "seven_day_sonnet": null,
+          "seven_day_opus": null
+        }
+        """#
+
+        let snapshot = ClaudeUsageClient.makeSnapshot(from: try decodeRaw(json), fetchedAt: Date())
+
+        XCTAssertEqual(snapshot.session?.percent, 37)
+        XCTAssertEqual(snapshot.weekly?.percent, 29)
+        XCTAssertEqual(snapshot.weeklyScoped.map(\.label), ["Fable"])
+        XCTAssertEqual(snapshot.weeklyScoped.map(\.percent), [19])
+        XCTAssertNotNil(snapshot.session?.resetsAt)
+        XCTAssertNotNil(snapshot.weekly?.resetsAt)
+    }
+
     private let fetchedAt = Date(timeIntervalSince1970: 1_751_700_000)
 
     private func decodeRaw(_ json: String) throws -> RawUsageResponse {

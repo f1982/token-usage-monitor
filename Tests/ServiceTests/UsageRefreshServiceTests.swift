@@ -73,6 +73,7 @@ final class UsageRefreshServiceTests: XCTestCase {
             aggregator: aggregator,
             codexUsageProvider: codexUsageProvider,
             cacheStore: cache,
+            historyStore: UsageHistoryStore(fileURL: nil),
             reloadWidgets: reloadWidgets,
             now: { clock.current }
         )
@@ -197,6 +198,36 @@ final class UsageRefreshServiceTests: XCTestCase {
         XCTAssertEqual(result.note, "Official statusline data not available.")
         XCTAssertEqual(result.weekly, stale.weekly)
         XCTAssertEqual(cache.writeCount, 0, "stale result must not overwrite cache")
+    }
+
+    func testClaudeFailureStillCachesFreshCodexUsageForWidget() async {
+        let aggregator = MockAggregator()
+        let cache = MockCacheStore()
+        let clock = MutableClock()
+        let codexProvider = MockCodexUsageProvider()
+        let codexLimits = [
+            UsageLimit(id: "codex-codex-10080", kind: "codex_codex_10080", label: "Codex weekly", percent: 1, resetsAt: nil),
+        ]
+        codexProvider.limits = codexLimits
+        cache.stored = makeSnapshot(fetchedAt: clock.current.addingTimeInterval(-10 * 60))
+        aggregator.results = [
+            QuotaAggregationResult(snapshot: nil, providerID: nil, failureNote: "Official statusline data not available."),
+        ]
+        var reloadCount = 0
+        let service = makeService(
+            aggregator: aggregator,
+            cache: cache,
+            clock: clock,
+            codexUsageProvider: codexProvider,
+            reloadWidgets: { reloadCount += 1 }
+        )
+
+        let result = await service.refresh()
+
+        XCTAssertEqual(result.codex, codexLimits)
+        XCTAssertEqual(cache.stored?.codex, codexLimits)
+        XCTAssertEqual(cache.writeCount, 1)
+        XCTAssertEqual(reloadCount, 1)
     }
 
     func testFailureWithoutCacheReturnsUnavailable() async {

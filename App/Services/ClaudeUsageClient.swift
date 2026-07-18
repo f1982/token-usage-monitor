@@ -16,7 +16,11 @@ protocol UsageFetching {
 
 struct RawUsageResponse: Decodable {
     var limits: [RawLimitEntry]?
+    var five_hour: RawUsageBucket?
     var seven_day: RawSevenDay?
+    var seven_day_sonnet: RawUsageBucket?
+    var seven_day_opus: RawUsageBucket?
+    var seven_day_fable: RawUsageBucket?
 }
 
 struct RawLimitEntry: Decodable {
@@ -36,10 +40,12 @@ struct RawModel: Decodable {
     var display_name: String?
 }
 
-struct RawSevenDay: Decodable {
+struct RawUsageBucket: Decodable {
     var utilization: Double?
     var resets_at: String?
 }
+
+typealias RawSevenDay = RawUsageBucket
 
 // MARK: - Client
 
@@ -100,25 +106,38 @@ struct ClaudeUsageClient: UsageFetching {
         let weeklyAllEntries = limits.enumerated().filter { $0.element.kind == "weekly_all" }
         let scopedEntries = limits.enumerated().filter { $0.element.kind == "weekly_scoped" }
 
-        let session = pickEntry(from: sessionEntries).map { index, entry in
+        var session = pickEntry(from: sessionEntries).map { index, entry in
             makeLimit(entry, index: index, label: "Session")
+        }
+        if let bucket = raw.five_hour, let utilization = bucket.utilization {
+            session = makeLimit(bucket, id: "five_hour", kind: "session", label: "Session", utilization: utilization)
         }
 
         var weekly = pickEntry(from: weeklyAllEntries).map { index, entry in
             makeLimit(entry, index: index, label: "All models")
         }
         if weekly == nil, let sevenDay = raw.seven_day, let utilization = sevenDay.utilization {
-            weekly = UsageLimit(
-                id: "seven_day",
-                kind: "weekly_all",
-                label: "All models",
-                percent: utilization,
-                resetsAt: parseISODate(sevenDay.resets_at)
-            )
+            weekly = makeLimit(sevenDay, id: "seven_day", kind: "weekly_all", label: "All models", utilization: utilization)
         }
 
-        let scoped = scopedEntries.map { index, entry in
+        var scoped = scopedEntries.map { index, entry in
             makeLimit(entry, index: index, label: entry.scope?.model?.display_name ?? "Weekly")
+        }
+        let currentScopedBuckets: [(id: String, label: String, bucket: RawUsageBucket?)] = [
+            ("seven_day_fable", "Fable", raw.seven_day_fable),
+            ("seven_day_sonnet", "Sonnet", raw.seven_day_sonnet),
+            ("seven_day_opus", "Opus", raw.seven_day_opus),
+        ]
+        for item in currentScopedBuckets {
+            guard let bucket = item.bucket, let utilization = bucket.utilization else { continue }
+            scoped.removeAll { $0.label.caseInsensitiveCompare(item.label) == .orderedSame }
+            scoped.append(makeLimit(
+                bucket,
+                id: item.id,
+                kind: "weekly_scoped",
+                label: item.label,
+                utilization: utilization
+            ))
         }
 
         let available = session != nil || weekly != nil || !scoped.isEmpty
@@ -146,6 +165,22 @@ struct ClaudeUsageClient: UsageFetching {
             label: label,
             percent: entry.percent ?? 0,
             resetsAt: parseISODate(entry.resets_at)
+        )
+    }
+
+    private static func makeLimit(
+        _ bucket: RawUsageBucket,
+        id: String,
+        kind: String,
+        label: String,
+        utilization: Double
+    ) -> UsageLimit {
+        UsageLimit(
+            id: id,
+            kind: kind,
+            label: label,
+            percent: min(max(utilization, 0), 100),
+            resetsAt: parseISODate(bucket.resets_at)
         )
     }
 

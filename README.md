@@ -57,15 +57,17 @@ Claude quota usage is fetched through providers, tried in order:
    pastes into Settings and stores in the macOS Keychain; off by default and
    marked experimental. The app does not read Claude Code credential files.
 
-The Overview page shows which source produced the current snapshot
-(`Source: Official statusline` / `Local estimate` / `Experimental OAuth`).
+The Overview page shows which source produced the Claude snapshot
+(`Claude source: Official statusline` / `Local estimate` / `Experimental OAuth`).
 
-Codex usage is read independently from the latest local Codex session JSONL
-under `~/.codex/sessions` by default. The path is configurable in Settings
-under **Codex**. The app looks for the newest `token_count` event and maps
-`rate_limits.primary` and `rate_limits.secondary` into Codex 5-hour and weekly
-rows, including reset timestamps. The widget reads those Codex rows only from
-the app's cached snapshot; it does not scan `~/.codex` directly.
+Codex usage is read independently under **Codex**. The app first requests the
+current account snapshot from an installed Codex CLI through the structured
+`account/rateLimits/read` app-server method. If the CLI is unavailable or the
+request fails, it falls back to recent local Codex session JSONL events. Limits
+are identified by their actual window duration rather than assuming `primary`
+always means 5-hour and `secondary` always means weekly. The widget reads those
+Codex rows only from the app's cached snapshot; it does not scan `~/.codex`
+directly.
 
 ### Setting up the statusline source
 
@@ -253,6 +255,9 @@ authorized signing configuration.
   totals in that request.
 - Display filters hide sources in the app and widget only; refresh still caches
   all available usage so switching sources back on is immediate.
+- The app asks the locally installed Codex CLI for current account limits. It
+  never reads or stores Codex credentials itself. If the CLI cannot be located
+  or launched, recent session telemetry is used automatically.
 - Provider failures fall back to the stale cache with a readable note that
   names the failing source.
 - Widget timeline asks for a reload every 15 minutes and shows cache age

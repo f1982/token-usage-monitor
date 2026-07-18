@@ -3,7 +3,8 @@
 Last updated: 2026-07-10
 
 Token Usage Monitor is a macOS app that displays usage information from files
-you explicitly choose and, if enabled, an Anthropic usage endpoint.
+you explicitly choose, a locally installed Codex CLI when available, and, if
+enabled, an Anthropic usage endpoint.
 
 The app is independent and is not affiliated with or endorsed by Anthropic,
 OpenAI, Claude Code, or Codex. Product names are used descriptively.
@@ -16,6 +17,11 @@ OpenAI, Claude Code, or Codex. Product names are used descriptively.
   model names, message counts, and timestamps needed for the local views.
 - Raw logs, prompts, and message content are not stored by the app.
 - The app does not sell, advertise against, or share local data.
+- When a Codex CLI is available, the app launches its local app-server and asks
+  it for the current account rate-limit snapshot. The app does not read, copy,
+  or store Codex credentials. The Codex CLI handles its own authenticated
+  request, which is governed by OpenAI's policies. If this request is not
+  available, the app uses the selected local Codex session files instead.
 
 ## Local storage
 

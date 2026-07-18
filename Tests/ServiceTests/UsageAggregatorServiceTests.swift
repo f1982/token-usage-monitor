@@ -73,7 +73,7 @@ final class UsageAggregatorServiceTests: XCTestCase {
         UsageAggregatorService(settingsProvider: { settings }, providers: providers, now: now)
     }
 
-    func testOfficialStatuslineSelectedWhenFresh() async {
+    func testOptInOAuthSelectedBeforeFreshStatusline() async {
         let statusline = success(.statusline, .official)
         let oauth = success(.oauthExperimental, .experimental)
         let service = makeService(
@@ -84,9 +84,9 @@ final class UsageAggregatorServiceTests: XCTestCase {
 
         let result = await service.fetchQuota()
 
-        XCTAssertEqual(result.providerID, .statusline)
-        XCTAssertEqual(result.snapshot?.provenance, .official)
-        XCTAssertEqual(oauth.callCount, 0, "no fallback when official data is fresh")
+        XCTAssertEqual(result.providerID, .oauthExperimental)
+        XCTAssertEqual(result.snapshot?.provenance, .experimental)
+        XCTAssertEqual(statusline.callCount, 0, "complete live data should not be replaced by statusline")
     }
 
     func testLocalFallbackNotUsedWhenDisabled() async {
@@ -232,7 +232,7 @@ final class UsageAggregatorServiceTests: XCTestCase {
         )
         XCTAssertEqual(
             UsageAggregatorService.providerOrder(for: settings(mode: .statuslineThenLocalThenOAuth, oauthEnabled: true)),
-            [.statusline, .localEstimate, .oauthExperimental]
+            [.oauthExperimental, .statusline, .localEstimate]
         )
         XCTAssertEqual(
             UsageAggregatorService.providerOrder(for: settings(mode: .statuslineThenLocalThenOAuth, oauthEnabled: false)),

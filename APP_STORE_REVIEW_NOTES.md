@@ -20,6 +20,11 @@ OpenAI, Claude Code, or Codex.
 The widget reads only normalized cache files in the shared App Group. It does
 not read the selected source directories directly.
 
+When a locally installed Codex CLI is available to the sandbox, the app asks
+its app-server for the current account rate-limit snapshot. The app never reads
+or stores Codex credentials. If the CLI cannot be located or launched, the app
+automatically uses the user-selected Codex session directory described above.
+
 ## OAuth
 
 OAuth is disabled by default and is not needed for the local statusline or
